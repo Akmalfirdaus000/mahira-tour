@@ -27,18 +27,20 @@ export default function FasilitasIndex({ fasilitas }: PageProps) {
                         </p>
                     </div>
 
-                    <div className="flex items-center gap-3">
-                        <Button variant="outline" className="h-12 rounded-2xl border-neutral-200 bg-white font-bold px-6 shadow-sm hover:bg-neutral-50 gap-2">
-                            <Download className="h-4 w-4" />
-                            Export
-                        </Button>
-                        <Button asChild className="h-12 rounded-2xl bg-neutral-900 text-white font-bold px-6 shadow-xl hover:bg-neutral-800 gap-2">
-                            <Link href={route('admin.fasilitas.create')}>
-                                <Plus className="h-4 w-4" />
-                                Tambah Fasilitas
-                            </Link>
-                        </Button>
-                    </div>
+                    {!window.location.pathname.startsWith('/super-admin') && (
+                        <div className="flex items-center gap-3">
+                            <Button variant="outline" className="h-12 rounded-2xl border-neutral-200 bg-white font-bold px-6 shadow-sm hover:bg-neutral-50 gap-2">
+                                <Download className="h-4 w-4" />
+                                Export
+                            </Button>
+                            <Button asChild className="h-12 rounded-2xl bg-neutral-900 text-white font-bold px-6 shadow-xl hover:bg-neutral-800 gap-2">
+                                <Link href={route('admin.fasilitas.create')}>
+                                    <Plus className="h-4 w-4" />
+                                    Tambah Fasilitas
+                                </Link>
+                            </Button>
+                        </div>
+                    )}
                 </div>
 
                 {/* Table Section */}

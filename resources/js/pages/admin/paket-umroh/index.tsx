@@ -27,18 +27,32 @@ export default function PaketUmrohIndex({ paket }: PageProps) {
                         </p>
                     </div>
 
-                    <div className="flex items-center gap-3">
-                        <Button variant="outline" className="h-12 rounded-2xl border-neutral-200 bg-white font-bold px-6 shadow-sm hover:bg-neutral-50 gap-2">
-                            <Download className="h-4 w-4" />
-                            Export
-                        </Button>
-                        <Button asChild className="h-12 rounded-2xl bg-neutral-900 text-white font-bold px-6 shadow-xl hover:bg-neutral-800 gap-2">
-                            <Link href={route('admin.paket-umroh.create')}>
-                                <Plus className="h-4 w-4" />
-                                Tambah Paket
-                            </Link>
-                        </Button>
-                    </div>
+                    {!window.location.pathname.startsWith('/super-admin') && (
+                        <div className="flex items-center gap-3">
+                            <a href={route('admin.paket-umroh.export')}>
+                                <Button variant="outline" className="h-12 rounded-2xl border-neutral-200 bg-white font-bold px-6 shadow-sm hover:bg-neutral-50 gap-2">
+                                    <Download className="h-4 w-4" />
+                                    Export
+                                </Button>
+                            </a>
+                            <Button asChild className="h-12 rounded-2xl bg-neutral-900 text-white font-bold px-6 shadow-xl hover:bg-neutral-800 gap-2">
+                                <Link href={route('admin.paket-umroh.create')}>
+                                    <Plus className="h-4 w-4" />
+                                    Tambah Paket
+                                </Link>
+                            </Button>
+                        </div>
+                    )}
+                    {window.location.pathname.startsWith('/super-admin') && (
+                        <div className="flex items-center gap-3">
+                            <a href={route('super-admin.paket-umroh.export')}>
+                                <Button variant="outline" className="h-12 rounded-2xl border-neutral-200 bg-white font-bold px-6 shadow-sm hover:bg-neutral-50 gap-2">
+                                    <Download className="h-4 w-4" />
+                                    Export
+                                </Button>
+                            </a>
+                        </div>
+                    )}
                 </div>
 
                 {/* Table Section */}

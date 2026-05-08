@@ -127,6 +127,31 @@ export default function PembayaranCreate({ pendaftaran, sisa_bayar }: PageProps)
                                 <CardTitle className="text-xl font-black">Form Konfirmasi</CardTitle>
                             </CardHeader>
                             <CardContent className="p-8 space-y-6">
+                                <div className="grid grid-cols-2 gap-3 mb-4">
+                                    <Button 
+                                        type="button"
+                                        variant="outline"
+                                        className={cn(
+                                            "rounded-xl h-12 font-bold text-xs border-2",
+                                            data.jumlah === 500000 ? "border-blue-600 bg-blue-50 text-blue-600" : "border-neutral-100"
+                                        )}
+                                        onClick={() => setData('jumlah', 500000)}
+                                    >
+                                        DP Minimal (500rb)
+                                    </Button>
+                                    <Button 
+                                        type="button"
+                                        variant="outline"
+                                        className={cn(
+                                            "rounded-xl h-12 font-bold text-xs border-2",
+                                            data.jumlah === sisa_bayar ? "border-blue-600 bg-blue-50 text-blue-600" : "border-neutral-100"
+                                        )}
+                                        onClick={() => setData('jumlah', sisa_bayar)}
+                                    >
+                                        Bayar Lunas
+                                    </Button>
+                                </div>
+
                                 <div className="space-y-2">
                                     <Label htmlFor="jumlah" className="text-xs font-bold uppercase tracking-wider">Jumlah yang Dibayar (IDR)</Label>
                                     <div className="relative">
@@ -135,7 +160,7 @@ export default function PembayaranCreate({ pendaftaran, sisa_bayar }: PageProps)
                                             id="jumlah" 
                                             type="number" 
                                             value={data.jumlah} 
-                                            onChange={e => setData('jumlah', e.target.value)} 
+                                            onChange={e => setData('jumlah', Number(e.target.value))} 
                                             className="h-14 pl-12 rounded-xl text-xl font-black border-2 focus:border-blue-500 bg-white"
                                         />
                                     </div>

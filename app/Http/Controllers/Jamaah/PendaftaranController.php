@@ -18,6 +18,7 @@ class PendaftaranController extends Controller
             ->findOrFail($id);
 
         $total_bayar = $pendaftaran->pembayaran->where('status', 'sukses')->sum('jumlah');
+        $total_pending = $pendaftaran->pembayaran->where('status', 'pending')->sum('jumlah');
         $sisa_bayar = $pendaftaran->keberangkatan->paketUmroh->harga - $total_bayar;
 
         $documents = \App\Models\Dokumen::where('jamaah_id', $user->jamaah->id)->get()->groupBy('jenis');
@@ -27,6 +28,7 @@ class PendaftaranController extends Controller
             'summary' => [
                 'total_harga' => $pendaftaran->keberangkatan->paketUmroh->harga,
                 'sudah_dibayar' => $total_bayar,
+                'total_pending' => $total_pending,
                 'sisa_pembayaran' => $sisa_bayar,
             ],
             'documents' => $documents,
@@ -69,7 +71,7 @@ class PendaftaranController extends Controller
         $jamaah = $user->jamaah;
         
         $all_keberangkatan = Keberangkatan::where('paket_id', $keberangkatan->paket_id)
-            ->where('tanggal_berangkat', '>', now())
+            ->where('tanggal_berangkat', '>=', today())
             ->where('sisa_kuota', '>', 0)
             ->get();
 

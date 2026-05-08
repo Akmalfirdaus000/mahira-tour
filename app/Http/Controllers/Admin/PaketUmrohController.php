@@ -83,4 +83,26 @@ class PaketUmrohController extends Controller
 
         return redirect()->route('admin.paket-umroh.index')->with('success', 'Paket Umroh berhasil dihapus!');
     }
+
+    public function export()
+    {
+        $packages = PaketUmroh::all();
+        $headers = ['Nama Paket', 'Harga', 'Durasi', 'Maskapai', 'Hotel', 'Kuota'];
+        $data = $packages->map(fn($p) => [
+            $p->nama_paket,
+            'Rp ' . number_format($p->harga, 0, ',', '.'),
+            $p->durasi_hari . ' Hari',
+            $p->maskapai,
+            $p->hotel,
+            $p->kuota
+        ]);
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.laporan', [
+            'title' => 'Daftar Paket Umroh Mahira Tour',
+            'headers' => $headers,
+            'data' => $data
+        ]);
+
+        return $pdf->download('paket-umroh.pdf');
+    }
 }

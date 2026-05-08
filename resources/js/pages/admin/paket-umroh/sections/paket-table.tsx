@@ -99,27 +99,31 @@ export function PaketTable({ data }: { data: PaketData[] }) {
                                 <TableCell className="text-right">
                                     <div className="flex items-center justify-end gap-2">
                                         <Button asChild variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-xl hover:bg-blue-50 hover:text-blue-700">
-                                            <Link href={route('admin.paket-umroh.show', item.id)}>
+                                            <Link href={window.location.pathname.startsWith('/super-admin') ? route('super-admin.paket-umroh.show', item.id) : route('admin.paket-umroh.show', item.id)}>
                                                 <Eye className="h-4 w-4" />
                                             </Link>
                                         </Button>
-                                        <Button asChild variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-xl hover:bg-amber-50 hover:text-amber-700">
-                                            <Link href={route('admin.paket-umroh.edit', item.id)}>
-                                                <Edit2 className="h-4 w-4" />
-                                            </Link>
-                                        </Button>
-                                        <Button 
-                                            variant="ghost" 
-                                            size="sm" 
-                                            className="h-9 w-9 p-0 rounded-xl hover:bg-red-50 hover:text-red-700"
-                                            onClick={() => {
-                                                if (confirm('Apakah Anda yakin ingin menghapus paket umroh ini?')) {
-                                                    router.delete(route('admin.paket-umroh.destroy', item.id));
-                                                }
-                                            }}
-                                        >
-                                            <Trash2 className="h-4 w-4" />
-                                        </Button>
+                                        {!window.location.pathname.startsWith('/super-admin') && (
+                                            <>
+                                                <Button asChild variant="ghost" size="sm" className="h-9 w-9 p-0 rounded-xl hover:bg-amber-50 hover:text-amber-700">
+                                                    <Link href={route('admin.paket-umroh.edit', item.id)}>
+                                                        <Edit2 className="h-4 w-4" />
+                                                    </Link>
+                                                </Button>
+                                                <Button 
+                                                    variant="ghost" 
+                                                    size="sm" 
+                                                    className="h-9 w-9 p-0 rounded-xl hover:bg-red-50 hover:text-red-700"
+                                                    onClick={() => {
+                                                        if (confirm('Apakah Anda yakin ingin menghapus paket umroh ini?')) {
+                                                            router.delete(route('admin.paket-umroh.destroy', item.id));
+                                                        }
+                                                    }}
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            </>
+                                        )}
                                     </div>
                                 </TableCell>
                             </TableRow>

@@ -107,12 +107,14 @@ export default function ShowJamaah({ jamaah }: Props) {
                         </Button>
                         <h1 className="text-3xl font-black tracking-tight text-foreground">Detail Jamaah</h1>
                     </div>
-                    <Button asChild className="rounded-2xl h-11 bg-amber-600 hover:bg-amber-700 text-white font-bold px-6 gap-2">
-                        <Link href={route('admin.jamaah.edit', jamaah.id)}>
-                            <Edit2 className="h-4 w-4" />
-                            Edit Profil
-                        </Link>
-                    </Button>
+                    {!window.location.pathname.startsWith('/super-admin') && (
+                        <Button asChild className="rounded-2xl h-11 bg-amber-600 hover:bg-amber-700 text-white font-bold px-6 gap-2">
+                            <Link href={route('admin.jamaah.edit', jamaah.id)}>
+                                <Edit2 className="h-4 w-4" />
+                                Edit Profil
+                            </Link>
+                        </Button>
+                    )}
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -261,28 +263,32 @@ export default function ShowJamaah({ jamaah }: Props) {
                                                                             <Eye className="h-4 w-4 text-blue-500" /> Lihat File
                                                                         </a>
                                                                     </DropdownMenuItem>
-                                                                    <DropdownMenuSeparator />
-                                                                    <DropdownMenuItem 
-                                                                        onClick={() => {
-                                                                            router.post(route('admin.dokumen.verify', doc.id), { status_verifikasi: 'valid' });
-                                                                        }}
-                                                                        disabled={doc.status_verifikasi === 'valid'}
-                                                                        className="rounded-lg gap-2 cursor-pointer font-bold text-xs text-green-600"
-                                                                    >
-                                                                        <ShieldCheck className="h-4 w-4" /> Tandai Valid
-                                                                    </DropdownMenuItem>
-                                                                    <DropdownMenuItem 
-                                                                        onClick={() => {
-                                                                            const catatan = prompt('Alasan penolakan:');
-                                                                            if (catatan !== null) {
-                                                                                router.post(route('admin.dokumen.verify', doc.id), { status_verifikasi: 'ditolak', catatan });
-                                                                            }
-                                                                        }}
-                                                                        disabled={doc.status_verifikasi === 'ditolak'}
-                                                                        className="rounded-lg gap-2 cursor-pointer font-bold text-xs text-red-600"
-                                                                    >
-                                                                        <AlertCircle className="h-4 w-4" /> Tolak Dokumen
-                                                                    </DropdownMenuItem>
+                                                                    {!window.location.pathname.startsWith('/super-admin') && (
+                                                                        <>
+                                                                            <DropdownMenuSeparator />
+                                                                            <DropdownMenuItem 
+                                                                                onClick={() => {
+                                                                                    router.post(route('admin.dokumen.verify', doc.id), { status_verifikasi: 'valid' });
+                                                                                }}
+                                                                                disabled={doc.status_verifikasi === 'valid'}
+                                                                                className="rounded-lg gap-2 cursor-pointer font-bold text-xs text-green-600"
+                                                                            >
+                                                                                <ShieldCheck className="h-4 w-4" /> Tandai Valid
+                                                                            </DropdownMenuItem>
+                                                                            <DropdownMenuItem 
+                                                                                onClick={() => {
+                                                                                    const catatan = prompt('Alasan penolakan:');
+                                                                                    if (catatan !== null) {
+                                                                                        router.post(route('admin.dokumen.verify', doc.id), { status_verifikasi: 'ditolak', catatan });
+                                                                                    }
+                                                                                }}
+                                                                                disabled={doc.status_verifikasi === 'ditolak'}
+                                                                                className="rounded-lg gap-2 cursor-pointer font-bold text-xs text-red-600"
+                                                                            >
+                                                                                <AlertCircle className="h-4 w-4" /> Tolak Dokumen
+                                                                            </DropdownMenuItem>
+                                                                        </>
+                                                                    )}
                                                                 </DropdownMenuContent>
                                                             </DropdownMenu>
                                                         </TableCell>
@@ -345,7 +351,34 @@ export default function ShowJamaah({ jamaah }: Props) {
                             </TabsContent>
 
                             {/* Tab Content: Pembayaran */}
-                            <TabsContent value="pembayaran" className="m-0 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <TabsContent value="pembayaran" className="m-0 animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-6">
+                                {jamaah.pendaftaran && jamaah.pendaftaran.length > 0 && (
+                                    <Card className="border-none shadow-xl rounded-[32px] overflow-hidden bg-neutral-50 p-8">
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                            <div className="space-y-1">
+                                                <p className="text-[10px] font-black uppercase text-neutral-400 tracking-widest">Total Tagihan (Semua Paket)</p>
+                                                <p className="text-xl font-black text-neutral-900">
+                                                    {formatCurrency(jamaah.pendaftaran.reduce((acc: number, reg: any) => acc + Number(reg.keberangkatan.paket_umroh.harga), 0))}
+                                                </p>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <p className="text-[10px] font-black uppercase text-green-600 tracking-widest">Total Sudah Dibayar</p>
+                                                <p className="text-xl font-black text-green-700">
+                                                    {formatCurrency(allPayments.filter(p => p.status === 'sukses').reduce((acc: number, p: any) => acc + Number(p.jumlah), 0))}
+                                                </p>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <p className="text-[10px] font-black uppercase text-red-600 tracking-widest">Sisa Tagihan</p>
+                                                <p className="text-xl font-black text-red-700">
+                                                    {formatCurrency(
+                                                        jamaah.pendaftaran.reduce((acc: number, reg: any) => acc + Number(reg.keberangkatan.paket_umroh.harga), 0) - 
+                                                        allPayments.filter(p => p.status === 'sukses').reduce((acc: number, p: any) => acc + Number(p.jumlah), 0)
+                                                    )}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </Card>
+                                )}
                                 <Card className="border-none shadow-xl rounded-[32px] overflow-hidden">
                                     <Table>
                                         <TableHeader className="bg-neutral-50/50">

@@ -39,4 +39,9 @@ class PaketUmroh extends Model
         return $this->belongsToMany(Fasilitas::class, 'paket_fasilitas', 'paket_id', 'fasilitas_id')
             ->withPivot('keterangan', 'created_at');
     }
+
+    public function pendaftaran(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
+    {
+        return $this->hasManyThrough(Pendaftaran::class, Keberangkatan::class, 'paket_id', 'keberangkatan_id');
+    }
 }

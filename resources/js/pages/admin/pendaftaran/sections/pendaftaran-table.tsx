@@ -129,42 +129,44 @@ export function PendaftaranTable({ data }: { data: PendaftaranData[] }) {
                                 <TableCell className="text-right">
                                     <div className="flex items-center justify-end gap-2">
                                         <Button asChild variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg hover:bg-blue-50 hover:text-blue-700">
-                                            <Link href={route('admin.pendaftaran.show', item.id)}>
+                                            <Link href={window.location.pathname.startsWith('/super-admin') ? route('super-admin.pendaftaran.show', item.id) : route('admin.pendaftaran.show', item.id)}>
                                                 <Eye className="h-4 w-4" />
                                             </Link>
                                         </Button>
                                         
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg">
-                                                    <MoreHorizontal className="h-4 w-4" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end" className="rounded-xl w-56 p-2">
-                                                <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-neutral-400 px-2 py-1.5">Manajemen Pendaftaran</DropdownMenuLabel>
-                                                <DropdownMenuItem onClick={() => updateStatus(item.id, 'pending')} className="rounded-lg gap-2 cursor-pointer font-bold text-xs">
-                                                    <Clock className="h-4 w-4 text-amber-500" /> Setel ke Pending
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem onClick={() => updateStatus(item.id, 'batal')} className="rounded-lg gap-2 cursor-pointer font-bold text-xs text-red-600">
-                                                    <XCircle className="h-4 w-4" /> Batalkan Pendaftaran
-                                                </DropdownMenuItem>
-                                                <DropdownMenuSeparator />
-                                                <div className="px-2 py-2 text-[9px] text-muted-foreground italic leading-tight">
-                                                    * Status Lunas/DP diperbarui secara otomatis oleh Staf Keuangan setelah verifikasi pembayaran.
-                                                </div>
-                                                <DropdownMenuSeparator />
-                                                <DropdownMenuItem 
-                                                    onClick={() => {
-                                                        if(confirm('Hapus permanen data pendaftaran ini?')) {
-                                                            router.delete(route('admin.pendaftaran.destroy', item.id));
-                                                        }
-                                                    }} 
-                                                    className="rounded-lg gap-2 cursor-pointer font-bold text-xs text-red-600 focus:bg-red-50 focus:text-red-600"
-                                                >
-                                                    <Trash2 className="h-4 w-4" /> Hapus Permanen
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
+                                        {!window.location.pathname.startsWith('/super-admin') && (
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg">
+                                                        <MoreHorizontal className="h-4 w-4" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end" className="rounded-xl w-56 p-2">
+                                                    <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-neutral-400 px-2 py-1.5">Manajemen Pendaftaran</DropdownMenuLabel>
+                                                    <DropdownMenuItem onClick={() => updateStatus(item.id, 'pending')} className="rounded-lg gap-2 cursor-pointer font-bold text-xs">
+                                                        <Clock className="h-4 w-4 text-amber-500" /> Setel ke Pending
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => updateStatus(item.id, 'batal')} className="rounded-lg gap-2 cursor-pointer font-bold text-xs text-red-600">
+                                                        <XCircle className="h-4 w-4" /> Batalkan Pendaftaran
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuSeparator />
+                                                    <div className="px-2 py-2 text-[9px] text-muted-foreground italic leading-tight">
+                                                        * Status Lunas/DP diperbarui secara otomatis oleh Staf Keuangan setelah verifikasi pembayaran.
+                                                    </div>
+                                                    <DropdownMenuSeparator />
+                                                    <DropdownMenuItem 
+                                                        onClick={() => {
+                                                            if(confirm('Hapus permanen data pendaftaran ini?')) {
+                                                                router.delete(route('admin.pendaftaran.destroy', item.id));
+                                                            }
+                                                        }} 
+                                                        className="rounded-lg gap-2 cursor-pointer font-bold text-xs text-red-600 focus:bg-red-50 focus:text-red-600"
+                                                    >
+                                                        <Trash2 className="h-4 w-4" /> Hapus Permanen
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        )}
                                     </div>
                                 </TableCell>
                             </TableRow>

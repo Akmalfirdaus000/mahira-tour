@@ -129,4 +129,25 @@ class JamaahController extends Controller
         
         return redirect()->route('admin.jamaah.index')->with('success', 'Data Jamaah berhasil dihapus!');
     }
+
+    public function export()
+    {
+        $jamaah = Jamaah::all();
+        $headers = ['NIK', 'Nama Lengkap', 'Jenis Kelamin', 'No HP', 'Kota'];
+        $data = $jamaah->map(fn($j) => [
+            $j->nik,
+            $j->nama_lengkap,
+            $j->jenis_kelamin,
+            $j->no_hp,
+            $j->kota
+        ]);
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.laporan', [
+            'title' => 'Data Jamaah Mahira Tour',
+            'headers' => $headers,
+            'data' => $data
+        ]);
+
+        return $pdf->download('data-jamaah.pdf');
+    }
 }

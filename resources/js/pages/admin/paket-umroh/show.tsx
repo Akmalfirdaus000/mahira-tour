@@ -53,18 +53,20 @@ export default function ShowPaketUmroh({ paket }: Props) {
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <Button asChild variant="ghost" size="sm" className="h-10 w-10 p-0 rounded-xl hover:bg-neutral-100">
-                            <Link href={route('admin.paket-umroh.index')}>
+                            <Link href={window.location.pathname.startsWith('/super-admin') ? route('super-admin.paket-umroh.index') : route('admin.paket-umroh.index')}>
                                 <ArrowLeft className="h-5 w-5" />
                             </Link>
                         </Button>
                         <h1 className="text-3xl font-black tracking-tight text-foreground">Detail Paket Umroh</h1>
                     </div>
-                    <Button asChild className="rounded-2xl h-11 bg-amber-600 hover:bg-amber-700 text-white font-bold px-6 gap-2">
-                        <Link href={route('admin.paket-umroh.edit', paket.id)}>
-                            <Edit2 className="h-4 w-4" />
-                            Edit Paket
-                        </Link>
-                    </Button>
+                    {!window.location.pathname.startsWith('/super-admin') && (
+                        <Button asChild className="rounded-2xl h-11 bg-amber-600 hover:bg-amber-700 text-white font-bold px-6 gap-2">
+                            <Link href={route('admin.paket-umroh.edit', paket.id)}>
+                                <Edit2 className="h-4 w-4" />
+                                Edit Paket
+                            </Link>
+                        </Button>
+                    )}
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -220,8 +222,8 @@ export default function ShowPaketUmroh({ paket }: Props) {
 
 ShowPaketUmroh.layout = {
     breadcrumbs: [
-        { title: 'Dashboard', href: '/admin/dashboard' },
-        { title: 'Paket Umroh', href: '/admin/paket-umroh' },
+        { title: window.location.pathname.startsWith('/super-admin') ? 'Super Admin' : 'Dashboard', href: window.location.pathname.startsWith('/super-admin') ? '/super-admin/dashboard' : '/admin/dashboard' },
+        { title: 'Paket Umroh', href: window.location.pathname.startsWith('/super-admin') ? '/super-admin/paket-umroh' : '/admin/paket-umroh' },
         { title: 'Detail', href: '#' },
     ],
 };

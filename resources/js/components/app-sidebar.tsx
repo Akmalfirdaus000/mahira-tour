@@ -9,7 +9,9 @@ import {
     Hotel, 
     Settings2, 
     UserPlus, 
-    FileText 
+    FileText,
+    CreditCard,
+    ShieldCheck
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
@@ -31,10 +33,13 @@ export function AppSidebar() {
     const { auth } = usePage().props;
     const user = auth.user;
     
-    // Check if user is admin
-    const isAdmin = (user as any).roles?.some((r: any) => r.name === 'admin' || r.name === 'super_admin') || 
-                    window.location.pathname.startsWith('/admin') || 
-                    window.location.pathname.startsWith('/super-admin');
+    const isSuperAdmin = (user as any).roles?.some((r: any) => r.name === 'super_admin');
+    
+    const isAdmin = (user as any).roles?.some((r: any) => r.name === 'admin') || 
+                    window.location.pathname.startsWith('/admin');
+
+    const isStaffKeuangan = (user as any).roles?.some((r: any) => r.name === 'staff_keuangan') || 
+                            window.location.pathname.startsWith('/staff-keuangan');
 
     const adminNavItems: NavItem[] = [
         {
@@ -74,6 +79,29 @@ export function AppSidebar() {
         },
     ];
 
+    const staffKeuanganNavItems: NavItem[] = [
+        {
+            title: 'Dashboard',
+            href: route('staff-keuangan.dashboard'),
+            icon: LayoutGrid,
+        },
+        {
+            title: 'Pembayaran',
+            href: route('staff-keuangan.pembayaran'),
+            icon: CreditCard,
+        },
+        {
+            title: 'Pendaftaran',
+            href: route('staff-keuangan.pendaftaran'),
+            icon: UserPlus,
+        },
+        {
+            title: 'Laporan Keuangan',
+            href: route('staff-keuangan.laporan'),
+            icon: FileText,
+        },
+    ];
+
     const footerNavItems: NavItem[] = [
         {
             title: 'Repository',
@@ -87,13 +115,76 @@ export function AppSidebar() {
         },
     ];
 
-    const mainNavItems: NavItem[] = isAdmin ? adminNavItems : [
+    const superAdminNavItems: NavItem[] = [
+        {
+            title: 'Dashboard',
+            href: route('super-admin.dashboard'),
+            icon: LayoutGrid,
+        },
+        {
+            title: 'Data User',
+            href: route('super-admin.user.index'),
+            icon: Users,
+        },
+        {
+            title: 'Role & Hak Akses',
+            href: route('super-admin.role.index'),
+            icon: ShieldCheck,
+        },
+        {
+            title: 'Data Jamaah',
+            href: route('super-admin.jamaah.index'),
+            icon: Users,
+        },
+        {
+            title: 'Paket Umroh',
+            href: route('super-admin.paket-umroh.index'),
+            icon: Package,
+        },
+        {
+            title: 'Keberangkatan',
+            href: route('super-admin.keberangkatan.index'),
+            icon: Plane,
+        },
+        {
+            title: 'Fasilitas',
+            href: route('super-admin.fasilitas.index'),
+            icon: Hotel,
+        },
+        {
+            title: 'Paket Fasilitas',
+            href: route('super-admin.paket-fasilitas.index'),
+            icon: Settings2,
+        },
+        {
+            title: 'Pendaftaran',
+            href: route('super-admin.pendaftaran.index'),
+            icon: UserPlus,
+        },
+        {
+            title: 'Pembayaran',
+            href: route('super-admin.pembayaran'),
+            icon: CreditCard,
+        },
+        {
+            title: 'Dokumen',
+            href: route('super-admin.dokumen.index'),
+            icon: FileText,
+        },
+        {
+            title: 'Laporan',
+            href: route('super-admin.laporan.index'),
+            icon: FileText,
+        },
+    ];
+
+    const mainNavItems: NavItem[] = isSuperAdmin ? superAdminNavItems : (isAdmin ? adminNavItems : (isStaffKeuangan ? staffKeuanganNavItems : [
         {
             title: 'Dashboard',
             href: dashboard(),
             icon: LayoutGrid,
         },
-    ];
+    ]));
 
     return (
         <Sidebar collapsible="icon" variant="inset">

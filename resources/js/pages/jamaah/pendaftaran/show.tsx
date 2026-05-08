@@ -1,5 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { 
     Calendar, 
@@ -23,6 +24,7 @@ interface PageProps {
     summary: {
         total_harga: number;
         sudah_dibayar: number;
+        total_pending: number;
         sisa_pembayaran: number;
     };
     documents: Record<string, any[]>;
@@ -39,11 +41,18 @@ export default function PendaftaranShow({ pendaftaran, summary, documents, categ
     };
 
     const formatDate = (dateString: string) => {
+        if (!dateString) return '-';
         return new Intl.DateTimeFormat('id-ID', {
             day: 'numeric',
             month: 'long',
             year: 'numeric',
         }).format(new Date(dateString));
+    };
+
+    const getDeadline = (dateString: string) => {
+        const date = new Date(dateString);
+        date.setDate(date.getDate() - 45); // H-45
+        return formatDate(date.toISOString());
     };
 
     const uploadedCount = categories.filter(cat => documents[cat.id] && documents[cat.id].length > 0).length;
@@ -75,6 +84,10 @@ export default function PendaftaranShow({ pendaftaran, summary, documents, categ
                     </div>
                     
                     <div className="flex items-center gap-2">
+                        <div className="text-right mr-4 hidden md:block">
+                            <p className="text-[10px] font-black text-red-600 uppercase tracking-widest">Batas Pelunasan (H-45)</p>
+                            <p className="text-sm font-bold text-neutral-900">{getDeadline(pendaftaran.keberangkatan.tanggal_berangkat)}</p>
+                        </div>
                         <Button variant="outline" className="rounded-xl border-amber-200 text-amber-700 hover:bg-amber-50">
                             Download Invoice
                         </Button>
@@ -153,7 +166,8 @@ export default function PendaftaranShow({ pendaftaran, summary, documents, categ
                                                 <div className="flex items-center gap-4">
                                                     <div className={cn(
                                                         "h-12 w-12 rounded-xl flex items-center justify-center",
-                                                        pay.status === 'sukses' ? "bg-green-50 text-green-600" : "bg-amber-50 text-amber-600"
+                                                        pay.status === 'sukses' ? "bg-green-50 text-green-600" : 
+                                                        pay.status === 'pending' ? "bg-blue-50 text-blue-600" : "bg-red-50 text-red-600"
                                                     )}>
                                                         <CreditCard className="h-6 w-6" />
                                                     </div>
@@ -162,12 +176,16 @@ export default function PendaftaranShow({ pendaftaran, summary, documents, categ
                                                         <p className="text-xs text-muted-foreground italic">{formatDate(pay.tanggal_bayar)} • {pay.metode.toUpperCase()}</p>
                                                     </div>
                                                 </div>
-                                                <span className={cn(
-                                                    "text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-tighter",
-                                                    pay.status === 'sukses' ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"
-                                                )}>
-                                                    {pay.status}
-                                                </span>
+                                                <div className="text-right">
+                                                    <Badge className={cn(
+                                                        "rounded-md px-2 py-0.5 font-black text-[8px] uppercase tracking-widest border-none",
+                                                        pay.status === 'sukses' ? "bg-green-600" :
+                                                        pay.status === 'pending' ? "bg-blue-600" : "bg-red-600"
+                                                    )}>
+                                                        {pay.status === 'pending' ? 'Menunggu Verifikasi' : pay.status}
+                                                    </Badge>
+                                                    {pay.status === 'pending' && <p className="text-[8px] font-bold text-blue-600 mt-1 italic">Harap tunggu admin</p>}
+                                                </div>
                                             </CardContent>
                                         </Card>
                                     ))
@@ -196,37 +214,54 @@ export default function PendaftaranShow({ pendaftaran, summary, documents, categ
                                         <span className="font-bold">{formatCurrency(summary.total_harga)}</span>
                                     </div>
                                     <div className="flex justify-between items-center text-sm text-green-600 font-bold">
-                                        <span>Sudah Dibayar</span>
+                                        <span>Total Sudah Verifikasi</span>
                                         <span>- {formatCurrency(summary.sudah_dibayar)}</span>
                                     </div>
+                                    {summary.total_pending > 0 && (
+                                        <div className="flex justify-between items-center text-sm text-blue-600 font-bold">
+                                            <span>Menunggu Verifikasi</span>
+                                            <span>{formatCurrency(summary.total_pending)}</span>
+                                        </div>
+                                    )}
                                     <div className="pt-4 border-t space-y-1">
-                                        <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Sisa Tagihan</p>
+                                        <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Sisa Tagihan (Fix)</p>
                                         <p className="text-3xl font-black text-amber-600">{formatCurrency(summary.sisa_pembayaran)}</p>
+                                        
+                                        {summary.sisa_pembayaran > 0 ? (
+                                            <p className="text-[10px] text-amber-700 font-bold italic mt-2">
+                                                * Harap segera lakukan pelunasan atau bayar DP minimal 500rb.
+                                            </p>
+                                        ) : (
+                                            <p className="text-[10px] text-green-700 font-bold italic mt-2">
+                                                * Tagihan Anda sudah lunas. Terima kasih.
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
 
-                                {summary.sisa_pembayaran > 0 ? (
-                                    <div className="space-y-4">
-                                        <div className="p-4 bg-amber-50 dark:bg-amber-900/10 rounded-2xl border border-amber-100 flex items-start gap-3">
-                                            <Info className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
-                                            <p className="text-[10px] text-amber-800 italic leading-relaxed">
-                                                Silakan lakukan pembayaran DP minimal 5 Juta atau pelunasan untuk mengonfirmasi keberangkatan Anda.
-                                            </p>
-                                        </div>
-                                        <Button asChild className="w-full h-16 bg-blue-600 hover:bg-blue-700 text-lg font-black rounded-2xl shadow-lg shadow-blue-600/30 group">
-                                            <Link href={route('jamaah.pembayaran.create', pendaftaran.id)}>
-                                                Bayar Sekarang
-                                                <ChevronRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
-                                            </Link>
+                                <div className="space-y-4">
+                                    {summary.sisa_pembayaran > 0 ? (
+                                        <>
+                                            <div className="p-4 bg-amber-50 dark:bg-amber-900/10 rounded-2xl border border-amber-100 flex items-start gap-3">
+                                                <Info className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+                                                <p className="text-[10px] text-amber-800 italic leading-relaxed">
+                                                    Batas akhir pelunasan paket adalah 45 hari sebelum keberangkatan (H-45).
+                                                </p>
+                                            </div>
+                                            <Button asChild className="w-full h-16 bg-blue-600 hover:bg-blue-700 text-lg font-black rounded-2xl shadow-lg shadow-blue-600/30 group">
+                                                <Link href={route('jamaah.pembayaran.create', pendaftaran.id)}>
+                                                    Bayar Sekarang
+                                                    <ChevronRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                                                </Link>
+                                            </Button>
+                                        </>
+                                    ) : (
+                                        <Button disabled className="w-full h-16 bg-neutral-200 text-neutral-400 text-lg font-black rounded-2xl cursor-not-allowed">
+                                            Sudah Lunas
+                                            <CheckCircle2 className="h-5 w-5 ml-2" />
                                         </Button>
-                                    </div>
-                                ) : (
-                                    <div className="p-6 bg-green-50 rounded-2xl text-center border border-green-100">
-                                        <CheckCircle2 className="h-10 w-10 text-green-600 mx-auto mb-2" />
-                                        <p className="font-black text-green-800">Tagihan Lunas</p>
-                                        <p className="text-[10px] text-green-700 italic">Terima kasih, pembayaran Anda telah selesai.</p>
-                                    </div>
-                                )}
+                                    )}
+                                </div>
                             </CardContent>
                         </Card>
                     </div>
