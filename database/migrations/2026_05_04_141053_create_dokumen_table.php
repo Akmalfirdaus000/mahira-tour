@@ -20,8 +20,7 @@ return new class extends Migration
                 'ktp_akta',
                 'kk',
                 'surat_nikah',
-                'vaksin_polio',
-                'vaksin_meningitis'
+                'vaksin'
             ]);
             $table->string('file_path');
             $table->enum('status_verifikasi', ['pending', 'valid', 'ditolak'])->default('pending');
