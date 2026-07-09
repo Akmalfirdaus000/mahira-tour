@@ -29,9 +29,7 @@ class PaketUmrohController extends Controller
      */
     public function show($id)
     {
-        $paket = PaketUmroh::with(['fasilitas', 'keberangkatan' => function($q) {
-            $q->where('tanggal_berangkat', '>=', today());
-        }])->findOrFail($id);
+        $paket = PaketUmroh::with(['fasilitas', 'keberangkatan'])->findOrFail($id);
 
         return Inertia::render('jamaah/paket-umroh/show', [
             'paket' => $paket

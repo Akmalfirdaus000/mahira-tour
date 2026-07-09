@@ -17,6 +17,7 @@ export interface PaymentData {
     metode: string;
     status: string;
     keterangan: string | null;
+    bukti_bayar: string | null;
     pendaftaran: {
         keberangkatan: {
             paket_umroh: {
@@ -53,7 +54,7 @@ export function PaymentList({ data }: { data: PaymentData[] }) {
                         <TableHead>Metode</TableHead>
                         <TableHead>Jumlah</TableHead>
                         <TableHead>Status</TableHead>
-                        <TableHead className="text-right">Aksi</TableHead>
+                        <TableHead className="text-right">Bukti</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -89,9 +90,15 @@ export function PaymentList({ data }: { data: PaymentData[] }) {
                                     <PaymentStatus status={item.status} />
                                 </TableCell>
                                 <TableCell className="text-right">
-                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:bg-blue-50">
-                                        <Download className="h-4 w-4" />
-                                    </Button>
+                                    {item.bukti_bayar ? (
+                                        <Button asChild variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:bg-blue-50">
+                                            <a href={`/storage/${item.bukti_bayar}`} target="_blank" rel="noopener noreferrer" title="Lihat Bukti Bayar">
+                                                <FileText className="h-4 w-4" />
+                                            </a>
+                                        </Button>
+                                    ) : (
+                                        <span className="text-xs text-muted-foreground italic">Tidak ada</span>
+                                    )}
                                 </TableCell>
                             </TableRow>
                         ))

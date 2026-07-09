@@ -127,7 +127,7 @@ export default function LaporanIndex({ popular_packages, upcoming_departures }: 
                 </div>
 
                 {/* Quick Export Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <a href={route('super-admin.laporan.jamaah')}>
                         <Button variant="outline" className="h-24 rounded-[32px] border-2 border-neutral-100 flex flex-col gap-2 hover:bg-blue-50 hover:border-blue-200 group transition-all w-full">
                             <Users className="h-6 w-6 text-neutral-400 group-hover:text-blue-600" />
@@ -138,12 +138,6 @@ export default function LaporanIndex({ popular_packages, upcoming_departures }: 
                         <Button variant="outline" className="h-24 rounded-[32px] border-2 border-neutral-100 flex flex-col gap-2 hover:bg-emerald-50 hover:border-emerald-200 group transition-all w-full">
                             <CreditCard className="h-6 w-6 text-neutral-400 group-hover:text-emerald-600" />
                             <span className="text-[10px] font-black uppercase tracking-widest">Laporan Keuangan</span>
-                        </Button>
-                    </a>
-                    <a href={route('super-admin.laporan.paket')}>
-                        <Button variant="outline" className="h-24 rounded-[32px] border-2 border-neutral-100 flex flex-col gap-2 hover:bg-amber-50 hover:border-amber-200 group transition-all w-full">
-                            <Package className="h-6 w-6 text-neutral-400 group-hover:text-amber-600" />
-                            <span className="text-[10px] font-black uppercase tracking-widest">Laporan Paket</span>
                         </Button>
                     </a>
                     <a href={route('super-admin.laporan.summary')}>

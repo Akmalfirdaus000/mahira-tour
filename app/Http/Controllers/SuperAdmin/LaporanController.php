@@ -51,7 +51,15 @@ class LaporanController extends Controller
             strtoupper($p->status)
         ]);
 
-        return $this->generatePdf('Laporan Keuangan', $headers, $data);
+        $totalSukses = Pembayaran::where('status', 'sukses')->sum('jumlah');
+        $totalPending = Pembayaran::where('status', 'pending')->sum('jumlah');
+
+        $summary = [
+            'Total Pendapatan (Sukses)' => 'Rp ' . number_format($totalSukses, 0, ',', '.'),
+            'Total Menunggu Verifikasi' => 'Rp ' . number_format($totalPending, 0, ',', '.'),
+        ];
+
+        return $this->generatePdf('Laporan Keuangan', $headers, $data, $summary);
     }
 
     public function exportPaket()
@@ -85,12 +93,13 @@ class LaporanController extends Controller
         return $this->generatePdf('Summary Tahunan Mahira Tour', $headers, $data);
     }
 
-    private function generatePdf($title, $headers, $data)
+    private function generatePdf($title, $headers, $data, $summary = null)
     {
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.laporan', [
             'title' => $title,
             'headers' => $headers,
-            'data' => $data
+            'data' => $data,
+            'summary' => $summary
         ]);
 
         return $pdf->download(str_replace(' ', '-', strtolower($title)) . '.pdf');

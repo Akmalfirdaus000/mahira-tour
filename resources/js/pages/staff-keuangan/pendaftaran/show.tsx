@@ -54,6 +54,13 @@ export default function PendaftaranShow({ pendaftaran, stats }: Props) {
         );
     }, [pendaftaran.jamaah.dokumen]);
 
+    const totalPending = React.useMemo(() => {
+        if (!pendaftaran.pembayaran) return 0;
+        return pendaftaran.pembayaran
+            .filter((p: any) => p.status === 'pending')
+            .reduce((sum: number, p: any) => sum + Number(p.jumlah), 0);
+    }, [pendaftaran.pembayaran]);
+
     const trackingSteps = React.useMemo(() => [
         { label: 'Pending', status: 'pending', active: true },
         { label: 'DP Masuk', status: 'dp', active: stats.total_paid > 0 },
@@ -188,6 +195,83 @@ export default function PendaftaranShow({ pendaftaran, stats }: Props) {
                                 </div>
                             </CardContent>
                         </Card>
+
+                        {/* Histori Transaksi & Bukti Pembayaran */}
+                        <Card className="border-none shadow-xl rounded-[32px] overflow-hidden">
+                            <CardHeader className="bg-neutral-900 text-white p-6">
+                                <CardTitle className="text-sm font-black uppercase tracking-widest flex items-center gap-2">
+                                    <CreditCard className="h-4 w-4" /> Histori Transaksi & Bukti Pembayaran
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="p-8 space-y-6">
+                                {!pendaftaran.pembayaran || pendaftaran.pembayaran.length === 0 ? (
+                                    <div className="text-center p-8 text-neutral-400 font-bold italic">
+                                        Belum ada histori pembayaran.
+                                    </div>
+                                ) : (
+                                    <div className="space-y-6">
+                                        {pendaftaran.pembayaran.map((pay: any, idx: number) => (
+                                            <div key={pay.id} className="p-6 rounded-2xl bg-neutral-50 border border-neutral-100 flex flex-col md:flex-row gap-6 justify-between items-start md:items-center">
+                                                <div className="space-y-3 flex-1">
+                                                    <div className="flex items-center gap-3">
+                                                        <span className="text-[10px] font-black uppercase text-neutral-400">Transaksi #{idx + 1}</span>
+                                                        <Badge className={cn(
+                                                            "rounded-md px-2 py-0.5 font-black text-[8px] uppercase tracking-widest border-none text-white",
+                                                            pay.status === 'sukses' ? "bg-green-600" :
+                                                            pay.status === 'gagal' ? "bg-red-600" : "bg-amber-500"
+                                                        )}>
+                                                            {pay.status}
+                                                        </Badge>
+                                                    </div>
+                                                    <div className="grid grid-cols-2 gap-4">
+                                                        <div>
+                                                            <p className="text-[10px] font-black uppercase text-neutral-400">Jumlah Bayar</p>
+                                                            <p className="font-black text-blue-600 text-lg">{formatCurrency(pay.jumlah)}</p>
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-[10px] font-black uppercase text-neutral-400">Metode & Tanggal</p>
+                                                            <p className="font-bold text-neutral-700 text-xs">{pay.metode.toUpperCase()} • {formatDate(pay.tanggal_bayar)}</p>
+                                                        </div>
+                                                    </div>
+                                                    {pay.catatan && (
+                                                        <div className="p-3 bg-neutral-100/50 rounded-xl text-xs text-neutral-600 italic">
+                                                            Catatan: {pay.catatan}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                
+                                                {/* Bukti Bayar Image */}
+                                                <div className="w-full md:w-48 shrink-0 space-y-2">
+                                                    <p className="text-[10px] font-black uppercase text-neutral-400">Bukti Pembayaran</p>
+                                                    {pay.bukti_bayar ? (
+                                                        <div className="relative group overflow-hidden rounded-xl border border-neutral-200 bg-white aspect-[4/3] flex items-center justify-center">
+                                                            <img 
+                                                                src={`/storage/${pay.bukti_bayar}`} 
+                                                                alt="Bukti Pembayaran" 
+                                                                className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+                                                            />
+                                                            <a 
+                                                                href={`/storage/${pay.bukti_bayar}`} 
+                                                                target="_blank" 
+                                                                rel="noopener noreferrer"
+                                                                className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs font-bold transition-opacity rounded-xl gap-1.5"
+                                                            >
+                                                                <FileText className="h-4 w-4" /> Lihat Penuh
+                                                            </a>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="h-24 rounded-xl border border-dashed border-neutral-200 bg-neutral-100/50 flex flex-col items-center justify-center text-neutral-400 italic text-xs gap-1.5">
+                                                            <AlertCircle className="h-5 w-5 text-neutral-300" />
+                                                            Tanpa Bukti Gambar
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </CardContent>
+                        </Card>
                     </div>
 
                     {/* Right Column: Payment & Tracking */}
@@ -206,12 +290,22 @@ export default function PendaftaranShow({ pendaftaran, stats }: Props) {
                                 </div>
                                 <div className="grid grid-cols-2 gap-4 border-t border-white/10 pt-6">
                                     <div className="space-y-1">
-                                        <p className="text-[10px] font-black uppercase opacity-60">Dibayar</p>
+                                        <p className="text-[10px] font-black uppercase opacity-60">Dibayar (Sukses)</p>
                                         <p className="text-lg font-black">{formatCurrency(stats.total_paid)}</p>
                                     </div>
                                     <div className="space-y-1 text-right">
-                                        <p className="text-[10px] font-black uppercase opacity-60">Sisa</p>
-                                        <p className="text-lg font-black text-amber-200">{formatCurrency(stats.remaining_bill)}</p>
+                                        <p className="text-[10px] font-black uppercase opacity-60">Menunggu Verifikasi</p>
+                                        <p className="text-lg font-black text-amber-200">{formatCurrency(totalPending)}</p>
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4 border-t border-white/10 pt-6">
+                                    <div className="space-y-1">
+                                        <p className="text-[10px] font-black uppercase opacity-60">Sisa Tagihan (Fix)</p>
+                                        <p className="text-lg font-black text-amber-100">{formatCurrency(stats.remaining_bill)}</p>
+                                    </div>
+                                    <div className="space-y-1 text-right">
+                                        <p className="text-[10px] font-black uppercase opacity-60">Sisa Bersih (Est.)</p>
+                                        <p className="text-lg font-black text-yellow-300">{formatCurrency(Math.max(0, stats.remaining_bill - totalPending))}</p>
                                     </div>
                                 </div>
                                 <div className="pt-2">

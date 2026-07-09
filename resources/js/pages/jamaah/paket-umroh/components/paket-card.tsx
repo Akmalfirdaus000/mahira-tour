@@ -95,10 +95,25 @@ export function PaketCard({ paket }: { paket: PaketUmrohProps }) {
                         <MapPin className="h-4 w-4 text-amber-500" />
                         <span className="line-clamp-1">{paket.hotel || 'Hotel Belum Ditentukan'}</span>
                     </div>
-                    {keberangkatanTerdekat && (
-                        <div className="flex items-center gap-2">
-                            <Calendar className="h-4 w-4 text-amber-500" />
-                            <span>Berangkat: <strong className="text-foreground">{formatterDate.format(new Date(keberangkatanTerdekat.tanggal_berangkat))}</strong></span>
+                    {paket.keberangkatan && paket.keberangkatan.length > 0 ? (
+                        <div className="space-y-1.5 border-t border-dashed pt-3 mt-3">
+                            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-1">
+                                <Calendar className="h-4 w-4 text-amber-500" />
+                                Jadwal Keberangkatan
+                            </p>
+                            <div className="flex flex-col gap-2 pl-6">
+                                {paket.keberangkatan.map((k) => (
+                                    <div key={k.id} className="flex justify-between items-center text-xs">
+                                        <span className="font-bold text-neutral-800 dark:text-neutral-200">{formatterDate.format(new Date(k.tanggal_berangkat))}</span>
+                                        <Badge variant="outline" className="text-[9px] px-2 py-0 h-4 border-amber-500/30 text-amber-700 bg-amber-50 dark:bg-amber-950/20 dark:text-amber-400">Sisa {k.sisa_kuota} Kursi</Badge>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="flex items-center gap-2 text-xs text-red-500 italic mt-3 border-t border-dashed pt-3">
+                            <Calendar className="h-4 w-4" />
+                            <span>Belum ada jadwal keberangkatan.</span>
                         </div>
                     )}
                 </div>

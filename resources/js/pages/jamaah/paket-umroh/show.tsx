@@ -24,8 +24,18 @@ interface ShowProps {
 }
 
 export default function PaketDetail({ paket }: ShowProps) {
+    const isExpired = (tanggal: string) => {
+        const date = new Date(tanggal);
+        date.setHours(0, 0, 0, 0);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return date < today;
+    };
+
+    const activeKeberangkatan = (paket.keberangkatan || []).filter(k => !isExpired(k.tanggal_berangkat));
+
     const [selectedScheduleId, setSelectedScheduleId] = useState<number | null>(
-        paket.keberangkatan && paket.keberangkatan.length > 0 ? paket.keberangkatan[0].id : null
+        activeKeberangkatan.length > 0 ? activeKeberangkatan[0].id : null
     );
 
     const formattedHarga = new Intl.NumberFormat('id-ID', {
@@ -174,31 +184,47 @@ export default function PaketDetail({ paket }: ShowProps) {
                                     </h4>
                                     <div className="space-y-3">
                                         {paket.keberangkatan && paket.keberangkatan.length > 0 ? (
-                                            paket.keberangkatan.map((k) => (
-                                                <div 
-                                                    key={k.id} 
-                                                    onClick={() => setSelectedScheduleId(k.id)}
-                                                    className={cn(
-                                                        "flex items-center justify-between p-4 rounded-xl border-2 transition-all cursor-pointer",
-                                                        selectedScheduleId === k.id 
-                                                            ? "border-amber-500 bg-amber-50/50 dark:bg-amber-900/10" 
-                                                            : "border-transparent bg-muted/50 hover:border-amber-500/30"
-                                                    )}
-                                                >
-                                                    <div>
-                                                        <p className="font-bold">{formatterDate.format(new Date(k.tanggal_berangkat))}</p>
-                                                        <p className="text-xs text-muted-foreground">Sisa: {k.sisa_kuota} kursi</p>
+                                            paket.keberangkatan.map((k) => {
+                                                const expired = isExpired(k.tanggal_berangkat);
+                                                return (
+                                                    <div 
+                                                        key={k.id} 
+                                                        onClick={() => !expired && setSelectedScheduleId(k.id)}
+                                                        className={cn(
+                                                            "flex items-center justify-between p-4 rounded-xl border-2 transition-all",
+                                                            expired
+                                                                ? "border-neutral-200 bg-neutral-100 opacity-60 cursor-not-allowed dark:bg-neutral-800/30 dark:border-neutral-800"
+                                                                : selectedScheduleId === k.id 
+                                                                    ? "border-amber-500 bg-amber-50/50 dark:bg-amber-900/10 cursor-pointer" 
+                                                                    : "border-transparent bg-muted/50 hover:border-amber-500/30 cursor-pointer"
+                                                        )}
+                                                    >
+                                                        <div>
+                                                            <p className="font-bold flex items-center gap-2">
+                                                                {formatterDate.format(new Date(k.tanggal_berangkat))}
+                                                                {expired && (
+                                                                    <Badge variant="outline" className="text-[9px] border-red-500/30 text-red-600 bg-red-50 dark:bg-red-950/20 dark:text-red-400 font-bold uppercase py-0 px-2 h-4">
+                                                                        Kadaluarsa
+                                                                    </Badge>
+                                                                )}
+                                                            </p>
+                                                            <p className="text-xs text-muted-foreground">
+                                                                {expired ? "Jadwal sudah lewat" : `Sisa: ${k.sisa_kuota} kursi`}
+                                                            </p>
+                                                        </div>
+                                                        {!expired && (
+                                                            <div className={cn(
+                                                                "h-6 w-6 rounded-full border-2 flex items-center justify-center transition-all",
+                                                                selectedScheduleId === k.id 
+                                                                    ? "border-amber-500 bg-amber-500 text-white" 
+                                                                    : "border-amber-500/30"
+                                                            )}>
+                                                                {selectedScheduleId === k.id && <Check className="h-3.5 w-3.5 stroke-[3]" />}
+                                                            </div>
+                                                        )}
                                                     </div>
-                                                    <div className={cn(
-                                                        "h-6 w-6 rounded-full border-2 flex items-center justify-center transition-all",
-                                                        selectedScheduleId === k.id 
-                                                            ? "border-amber-500 bg-amber-500 text-white" 
-                                                            : "border-amber-500/30"
-                                                    )}>
-                                                        {selectedScheduleId === k.id && <Check className="h-3.5 w-3.5 stroke-[3]" />}
-                                                    </div>
-                                                </div>
-                                            ))
+                                                );
+                                            })
                                         ) : (
                                             <p className="text-red-500 text-sm font-medium">Maaf, kuota sudah habis atau jadwal belum tersedia.</p>
                                         )}
@@ -217,8 +243,10 @@ export default function PaketDetail({ paket }: ShowProps) {
                                 
                                 <div className="flex flex-col gap-4 text-center">
                                     <p className="text-sm text-muted-foreground">Butuh bantuan?</p>
-                                    <Button variant="outline" className="rounded-xl border-amber-500/20 text-amber-600 hover:bg-amber-50">
-                                        Hubungi CS via WhatsApp
+                                    <Button variant="outline" className="rounded-xl border-amber-500/20 text-amber-600 hover:bg-amber-50" asChild>
+                                        <a href="https://wa.me/6282184515310" target="_blank" rel="noopener noreferrer">
+                                            Hubungi CS via WhatsApp
+                                        </a>
                                     </Button>
                                 </div>
                             </CardContent>

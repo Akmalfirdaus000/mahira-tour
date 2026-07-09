@@ -68,6 +68,12 @@ class PendaftaranController extends Controller
     {
         $user = auth()->user();
         $keberangkatan = Keberangkatan::with('paketUmroh')->findOrFail($keberangkatan_id);
+
+        if (\Carbon\Carbon::parse($keberangkatan->tanggal_berangkat)->lt(today())) {
+            return redirect()->route('jamaah.paket-umroh')
+                ->with('error', 'Jadwal keberangkatan ini sudah lewat/kadaluarsa.');
+        }
+
         $jamaah = $user->jamaah;
         
         $all_keberangkatan = Keberangkatan::where('paket_id', $keberangkatan->paket_id)
@@ -75,7 +81,9 @@ class PendaftaranController extends Controller
             ->where('sisa_kuota', '>', 0)
             ->get();
 
-        $documents = \App\Models\Dokumen::where('jamaah_id', $jamaah->id)->get()->groupBy('jenis');
+        $documents = $jamaah 
+            ? \App\Models\Dokumen::where('jamaah_id', $jamaah->id)->get()->groupBy('jenis')
+            : (object) [];
 
         return Inertia::render('jamaah/pendaftaran/konfirmasi', [
             'keberangkatan' => $keberangkatan,
@@ -109,20 +117,46 @@ class PendaftaranController extends Controller
             'konfirmasi' => 'accepted',
         ]);
 
+        $keberangkatan = Keberangkatan::findOrFail($request->keberangkatan_id);
+        if (\Carbon\Carbon::parse($keberangkatan->tanggal_berangkat)->lt(today())) {
+            return redirect()->route('jamaah.paket-umroh')
+                ->with('error', 'Jadwal keberangkatan ini sudah lewat/kadaluarsa.');
+        }
+
+        if ($keberangkatan->sisa_kuota <= 0) {
+            return redirect()->route('jamaah.paket-umroh')
+                ->with('error', 'Maaf, kuota untuk keberangkatan ini sudah penuh.');
+        }
+
         $user = $request->user();
         $jamaah = $user->jamaah;
 
-        $jamaah->update([
-            'nik' => $request->nik,
-            'nama_lengkap' => $request->nama_lengkap,
-            'tempat_lahir' => $request->tempat_lahir,
-            'tanggal_lahir' => $request->tanggal_lahir,
-            'jenis_kelamin' => $request->jenis_kelamin,
-            'no_hp' => $request->no_hp,
-            'alamat' => $request->alamat,
-            'kota' => $request->kota,
-            'provinsi' => $request->provinsi,
-        ]);
+        if (!$jamaah) {
+            $jamaah = \App\Models\Jamaah::create([
+                'user_id' => $user->id,
+                'nik' => $request->nik,
+                'nama_lengkap' => $request->nama_lengkap,
+                'tempat_lahir' => $request->tempat_lahir,
+                'tanggal_lahir' => $request->tanggal_lahir,
+                'jenis_kelamin' => $request->jenis_kelamin,
+                'no_hp' => $request->no_hp,
+                'alamat' => $request->alamat,
+                'kota' => $request->kota,
+                'provinsi' => $request->provinsi,
+            ]);
+        } else {
+            $jamaah->update([
+                'nik' => $request->nik,
+                'nama_lengkap' => $request->nama_lengkap,
+                'tempat_lahir' => $request->tempat_lahir,
+                'tanggal_lahir' => $request->tanggal_lahir,
+                'jenis_kelamin' => $request->jenis_kelamin,
+                'no_hp' => $request->no_hp,
+                'alamat' => $request->alamat,
+                'kota' => $request->kota,
+                'provinsi' => $request->provinsi,
+            ]);
+        }
 
         $pendaftaran = Pendaftaran::where('jamaah_id', $jamaah->id)
             ->where('keberangkatan_id', $request->keberangkatan_id)
@@ -138,6 +172,8 @@ class PendaftaranController extends Controller
             'tanggal_daftar' => now(),
             'status' => 'pending',
         ]);
+
+        $keberangkatan->decrement('sisa_kuota');
 
         return redirect()->route('jamaah.pendaftaran')->with('success', 'Pendaftaran berhasil dikirim! Silakan pantau status pendaftaran Anda.');
     }

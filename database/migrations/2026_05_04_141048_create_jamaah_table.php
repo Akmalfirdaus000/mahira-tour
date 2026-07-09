@@ -14,15 +14,15 @@ return new class extends Migration
         Schema::create('jamaah', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->unique()->constrained('users')->cascadeOnDelete();
-            $table->string('nik')->unique();
+            $table->string('nik')->nullable()->unique();
             $table->string('nama_lengkap');
-            $table->string('tempat_lahir');
-            $table->date('tanggal_lahir');
-            $table->string('jenis_kelamin');
-            $table->text('alamat');
-            $table->string('kota');
-            $table->string('provinsi');
-            $table->string('no_hp');
+            $table->string('tempat_lahir')->nullable();
+            $table->date('tanggal_lahir')->nullable();
+            $table->string('jenis_kelamin')->nullable();
+            $table->text('alamat')->nullable();
+            $table->string('kota')->nullable();
+            $table->string('provinsi')->nullable();
+            $table->string('no_hp')->nullable();
             $table->timestamps();
         });
     }

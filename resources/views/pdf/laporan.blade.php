@@ -10,9 +10,12 @@
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
         th { background-color: #f3f4f6; font-weight: bold; }
-        .footer { margin-top: 30px; text-align: right; font-style: italic; font-size: 10px; }
-        .summary { margin-top: 20px; padding: 10px; background-color: #f9fafb; border-radius: 5px; }
-        .total { font-weight: bold; font-size: 14px; color: #1e40af; }
+        .footer { margin-top: 30px; text-align: right; font-style: italic; font-size: 10px; clear: both; }
+        .summary { margin-top: 20px; padding: 15px; background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; width: 350px; float: right; }
+        .summary-title { margin-top: 0; color: #1e40af; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px; font-size: 12px; font-weight: bold; }
+        .summary-table { width: 100%; border: none; margin-top: 5px; }
+        .summary-table td { border: none; padding: 4px 0; }
+        .total-highlight { font-weight: bold; font-size: 13px; color: #16a34a; }
     </style>
 </head>
 <body>
@@ -42,6 +45,21 @@
             @endforeach
         </tbody>
     </table>
+
+    @if(isset($summary) && is_array($summary))
+        <div class="summary">
+            <div class="summary-title">Ringkasan Laporan</div>
+            <table class="summary-table">
+                @foreach($summary as $label => $value)
+                    <tr>
+                        <td style="font-weight: bold; color: #4b5563;">{{ $label }}</td>
+                        <td style="text-align: right; font-weight: bold;" class="{{ str_contains(strtolower($label), 'sukses') || str_contains(strtolower($label), 'pendapatan') ? 'total-highlight' : '' }}">{{ $value }}</td>
+                    </tr>
+                @endforeach
+            </table>
+        </div>
+        <div style="clear: both;"></div>
+    @endif
 
     <div class="footer">
         Mahira Tour - Solusi Perjalanan Ibadah Anda

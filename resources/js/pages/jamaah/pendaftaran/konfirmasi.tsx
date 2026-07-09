@@ -2,33 +2,45 @@ import { Head, useForm, Link, router } from '@inertiajs/react';
 import { toast } from 'sonner';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle,
+    CardFooter,
+} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { 
-    Calendar, 
-    Package, 
-    ArrowLeft, 
-    CheckCircle2, 
-    User, 
-    MapPin, 
-    Phone, 
+import {
+    Calendar,
+    Package,
+    ArrowLeft,
+    CheckCircle2,
+    User,
+    MapPin,
+    Phone,
     Fingerprint,
     Plane,
     Building2,
     Info,
     AlertTriangle,
     FileCheck,
-    ChevronRight
+    ChevronRight,
 } from 'lucide-react';
-import { 
-    Dialog, 
-    DialogContent, 
-    DialogHeader, 
-    DialogTitle, 
-    DialogDescription
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 
@@ -74,15 +86,23 @@ interface KonfirmasiProps {
     categories: Category[];
 }
 
-export default function PendaftaranKonfirmasi({ keberangkatan, all_keberangkatan, jamaah, documents, categories }: KonfirmasiProps) {
+export default function PendaftaranKonfirmasi({
+    keberangkatan,
+    all_keberangkatan,
+    jamaah,
+    documents,
+    categories,
+}: KonfirmasiProps) {
     const [showSuccessModal, setShowSuccessModal] = useState(false);
-    
+
     const { data, setData, post, processing, errors } = useForm({
         keberangkatan_id: keberangkatan.id,
         nik: jamaah?.nik || '',
         nama_lengkap: jamaah?.nama_lengkap || '',
         tempat_lahir: jamaah?.tempat_lahir || '',
-        tanggal_lahir: jamaah?.tanggal_lahir ? new Date(jamaah.tanggal_lahir).toISOString().split('T')[0] : '',
+        tanggal_lahir: jamaah?.tanggal_lahir
+            ? new Date(jamaah.tanggal_lahir).toISOString().split('T')[0]
+            : '',
         jenis_kelamin: jamaah?.jenis_kelamin || 'Laki-laki',
         no_hp: jamaah?.no_hp || '',
         alamat: jamaah?.alamat || '',
@@ -91,8 +111,12 @@ export default function PendaftaranKonfirmasi({ keberangkatan, all_keberangkatan
         konfirmasi: false,
     });
 
-    const uploadedCount = categories.filter(cat => documents[cat.id] && documents[cat.id].length > 0).length;
-    const isDocumentComplete = uploadedCount === categories.length;
+    const requiredCategoryIds = ['pas_foto', 'ktp_akta', 'kk'];
+    const uploadedRequiredCount = requiredCategoryIds.filter(
+        (id) => documents[id] && documents[id].length > 0,
+    ).length;
+    const isDocumentComplete =
+        uploadedRequiredCount === requiredCategoryIds.length;
 
     const formatCurrency = (amount: string | number) => {
         return new Intl.NumberFormat('id-ID', {
@@ -112,194 +136,820 @@ export default function PendaftaranKonfirmasi({ keberangkatan, all_keberangkatan
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         const toastId = toast.loading('Sedang mengirim pendaftaran...');
-        
+
         post(route('jamaah.pendaftaran.store'), {
             onSuccess: () => {
                 toast.dismiss(toastId);
                 setShowSuccessModal(true);
             },
-            onError: () => {
+            onError: (errs) => {
                 toast.dismiss(toastId);
-            }
+                toast.error('Gagal mengirim pendaftaran. Silakan periksa kembali inputan Anda.');
+            },
         });
     };
 
     return (
         <>
             <Head title="Form Pendaftaran" />
-            <div className="flex flex-col gap-8 p-6 md:p-10 max-w-6xl mx-auto w-full">
-                <Link 
+            <div
+                className={cn(
+                    'flex',
+                    'flex-col',
+                    'gap-8',
+                    'mx-auto',
+                    'p-6',
+                    'md:p-10',
+                    'w-full',
+                    'max-w-6xl',
+                )}
+            >
+                <Link
                     href={`/jamaah/paket-umroh/${keberangkatan.id}`}
-                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-amber-600 transition-colors w-fit"
+                    className={cn(
+                        'flex',
+                        'items-center',
+                        'gap-2',
+                        'w-fit',
+                        'text-muted-foreground',
+                        'hover:text-amber-600',
+                        'text-sm',
+                        'transition-colors',
+                    )}
                 >
-                    <ArrowLeft className="h-4 w-4" />
+                    <ArrowLeft className={cn('w-4', 'h-4')} />
                     Kembali ke Detail Paket
                 </Link>
 
-                <div className="flex flex-col gap-2">
-                    <h1 className="text-4xl font-black text-foreground tracking-tight">Form Pendaftaran Umroh</h1>
-                    <p className="text-muted-foreground italic text-lg">
-                        Silakan lengkapi formulir pendaftaran di bawah ini untuk memulai perjalanan ibadah Anda.
+                <div className={cn('flex', 'flex-col', 'gap-2')}>
+                    <h1
+                        className={cn(
+                            'font-black',
+                            'text-foreground',
+                            'text-4xl',
+                            'tracking-tight',
+                        )}
+                    >
+                        Form Pendaftaran Umroh
+                    </h1>
+                    <p
+                        className={cn(
+                            'text-muted-foreground',
+                            'text-lg',
+                            'italic',
+                        )}
+                    >
+                        Silakan lengkapi formulir pendaftaran di bawah ini untuk
+                        memulai perjalanan ibadah Anda.
                     </p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                    
-                    <div className="lg:col-span-8 space-y-8">
-                        <Card className="border-none bg-blue-50/50 dark:bg-blue-900/10 shadow-none rounded-[32px] overflow-hidden border-2 border-blue-100 dark:border-blue-900/30">
-                            <CardHeader className="bg-blue-600 text-white p-6">
-                                <CardTitle className="text-lg flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                        <FileCheck className="h-5 w-5" />
+                <form
+                    onSubmit={handleSubmit}
+                    className={cn(
+                        'items-start',
+                        'gap-8',
+                        'grid',
+                        'grid-cols-1',
+                        'lg:grid-cols-12',
+                    )}
+                >
+                    <div className={cn('space-y-8', 'lg:col-span-8')}>
+                        <Card
+                            className={cn(
+                                'bg-blue-50/50',
+                                'dark:bg-blue-900/10',
+                                'shadow-none',
+                                'border-2',
+                                'border-blue-100',
+                                'dark:border-blue-900/30',
+                                'border-none',
+                                'rounded-[32px]',
+                                'overflow-hidden',
+                            )}
+                        >
+                            <CardHeader
+                                className={cn(
+                                    'bg-blue-600',
+                                    'p-6',
+                                    'text-white',
+                                )}
+                            >
+                                <CardTitle
+                                    className={cn(
+                                        'flex',
+                                        'justify-between',
+                                        'items-center',
+                                        'text-lg',
+                                    )}
+                                >
+                                    <div
+                                        className={cn(
+                                            'flex',
+                                            'items-center',
+                                            'gap-2',
+                                        )}
+                                    >
+                                        <FileCheck
+                                            className={cn('w-5', 'h-5')}
+                                        />
                                         📂 Status Dokumen Persyaratan
                                     </div>
-                                    <span className="text-xs font-bold bg-white/20 px-3 py-1 rounded-full uppercase">
-                                        {uploadedCount} / {categories.length} Lengkap
+                                    <span
+                                        className={cn(
+                                            'bg-white/20',
+                                            'px-3',
+                                            'py-1',
+                                            'rounded-full',
+                                            'font-bold',
+                                            'text-xs',
+                                            'uppercase',
+                                        )}
+                                    >
+                                        {uploadedRequiredCount} /{' '}
+                                        {requiredCategoryIds.length} Wajib
+                                        Lengkap
                                     </span>
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="p-6">
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+                                <div
+                                    className={cn(
+                                        'gap-3',
+                                        'grid',
+                                        'grid-cols-1',
+                                        'sm:grid-cols-2',
+                                        'mb-6',
+                                    )}
+                                >
                                     {categories.map((cat) => {
                                         const doc = documents[cat.id]?.[0];
                                         const isUploaded = !!doc;
+                                        const isRequired =
+                                            requiredCategoryIds.includes(
+                                                cat.id,
+                                            );
                                         return (
-                                            <div key={cat.id} className="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-neutral-900 border shadow-sm">
-                                                <div className="flex items-center gap-2">
-                                                    {isUploaded ? <CheckCircle2 className="h-4 w-4 text-green-500" /> : <AlertTriangle className="h-4 w-4 text-amber-500" />}
-                                                    <span className="text-xs font-bold">{cat.label}</span>
+                                            <div
+                                                key={cat.id}
+                                                className={cn(
+                                                    'flex',
+                                                    'justify-between',
+                                                    'items-center',
+                                                    'bg-white',
+                                                    'dark:bg-neutral-900',
+                                                    'shadow-sm',
+                                                    'p-3',
+                                                    'border',
+                                                    'rounded-xl',
+                                                )}
+                                            >
+                                                <div
+                                                    className={cn(
+                                                        'flex',
+                                                        'items-center',
+                                                        'gap-2',
+                                                    )}
+                                                >
+                                                    {isUploaded ? (
+                                                        <CheckCircle2
+                                                            className={cn(
+                                                                'w-4',
+                                                                'h-4',
+                                                                'text-green-500',
+                                                            )}
+                                                        />
+                                                    ) : isRequired ? (
+                                                        <AlertTriangle
+                                                            className={cn(
+                                                                'w-4',
+                                                                'h-4',
+                                                                'text-amber-500',
+                                                            )}
+                                                        />
+                                                    ) : (
+                                                        <Info
+                                                            className={cn(
+                                                                'w-4',
+                                                                'h-4',
+                                                                'text-neutral-400',
+                                                            )}
+                                                        />
+                                                    )}
+                                                    <span
+                                                        className={cn(
+                                                            'font-bold',
+                                                            'text-xs',
+                                                        )}
+                                                    >
+                                                        {cat.label}{' '}
+                                                        {!isRequired && (
+                                                            <span
+                                                                className={cn(
+                                                                    'font-normal',
+                                                                    'text-[10px]',
+                                                                    'text-muted-foreground',
+                                                                )}
+                                                            >
+                                                                (Opsional)
+                                                            </span>
+                                                        )}
+                                                    </span>
                                                 </div>
-                                                <span className={cn("text-[10px] uppercase font-black tracking-widest", isUploaded ? "text-green-600" : "text-amber-600")}>
-                                                    {isUploaded ? 'Lengkap' : 'Belum Upload'}
+                                                <span
+                                                    className={cn(
+                                                        'text-[10px] font-black tracking-widest uppercase',
+                                                        isUploaded
+                                                            ? 'text-green-600'
+                                                            : isRequired
+                                                              ? 'text-amber-600'
+                                                              : 'text-neutral-400',
+                                                    )}
+                                                >
+                                                    {isUploaded
+                                                        ? 'Lengkap'
+                                                        : 'Belum Upload'}
                                                 </span>
                                             </div>
                                         );
                                     })}
                                 </div>
-                                
+
                                 {!isDocumentComplete && (
-                                    <div className="p-4 bg-amber-100/50 dark:bg-amber-900/20 rounded-2xl border border-amber-200 dark:border-amber-900/30 flex flex-col md:flex-row items-center justify-between gap-4">
-                                        <div className="flex items-start gap-3">
-                                            <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+                                    <div
+                                        className={cn(
+                                            'flex',
+                                            'md:flex-row',
+                                            'flex-col',
+                                            'justify-between',
+                                            'items-center',
+                                            'gap-4',
+                                            'bg-amber-100/50',
+                                            'dark:bg-amber-900/20',
+                                            'p-4',
+                                            'border',
+                                            'border-amber-200',
+                                            'dark:border-amber-900/30',
+                                            'rounded-2xl',
+                                        )}
+                                    >
+                                        <div
+                                            className={cn(
+                                                'flex',
+                                                'items-start',
+                                                'gap-3',
+                                            )}
+                                        >
+                                            <AlertTriangle
+                                                className={cn(
+                                                    'mt-0.5',
+                                                    'w-5',
+                                                    'h-5',
+                                                    'text-amber-600',
+                                                    'shrink-0',
+                                                )}
+                                            />
                                             <div>
-                                                <p className="text-sm font-bold text-amber-900 dark:text-amber-100">Dokumen Belum Lengkap!</p>
-                                                <p className="text-xs text-amber-800 dark:text-amber-200 italic">Anda harus melengkapi seluruh dokumen sebelum dapat mengirim pendaftaran.</p>
+                                                <p
+                                                    className={cn(
+                                                        'font-bold',
+                                                        'text-amber-900',
+                                                        'dark:text-amber-100',
+                                                        'text-sm',
+                                                    )}
+                                                >
+                                                    Dokumen Belum Lengkap!
+                                                </p>
+                                                <p
+                                                    className={cn(
+                                                        'text-amber-800',
+                                                        'dark:text-amber-200',
+                                                        'text-xs',
+                                                        'italic',
+                                                    )}
+                                                >
+                                                    Anda harus melengkapi
+                                                    seluruh dokumen wajib
+                                                    sebelum dapat mengirim
+                                                    pendaftaran.
+                                                </p>
                                             </div>
                                         </div>
-                                        <Button asChild variant="outline" className="rounded-xl border-amber-500 text-amber-700 hover:bg-amber-500 hover:text-white">
-                                            <Link href={route('jamaah.dokumen')}>Upload Sekarang</Link>
+                                        <Button
+                                            asChild
+                                            variant="outline"
+                                            className={cn(
+                                                'hover:bg-amber-500',
+                                                'border-amber-500',
+                                                'rounded-xl',
+                                                'text-amber-700',
+                                                'hover:text-white',
+                                            )}
+                                        >
+                                            <Link
+                                                href={route('jamaah.dokumen')}
+                                            >
+                                                Upload Sekarang
+                                            </Link>
                                         </Button>
                                     </div>
                                 )}
                             </CardContent>
                         </Card>
 
-                        <Card className="border-none shadow-xl rounded-[32px] overflow-hidden">
-                            <CardHeader className="bg-neutral-800 text-white p-8">
-                                <CardTitle className="text-2xl flex items-center gap-3">
-                                    <User className="h-7 w-7" />
+                        <Card
+                            className={cn(
+                                'shadow-xl',
+                                'border-none',
+                                'rounded-[32px]',
+                                'overflow-hidden',
+                            )}
+                        >
+                            <CardHeader
+                                className={cn(
+                                    'bg-neutral-800',
+                                    'p-8',
+                                    'text-white',
+                                )}
+                            >
+                                <CardTitle
+                                    className={cn(
+                                        'flex',
+                                        'items-center',
+                                        'gap-3',
+                                        'text-2xl',
+                                    )}
+                                >
+                                    <User className={cn('w-7', 'h-7')} />
                                     Data Diri Jamaah
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent className="p-8 space-y-8">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <CardContent className={cn('space-y-8', 'p-8')}>
+                                <div
+                                    className={cn(
+                                        'gap-6',
+                                        'grid',
+                                        'grid-cols-1',
+                                        'md:grid-cols-2',
+                                    )}
+                                >
                                     <div className="space-y-2">
-                                        <Label className="text-xs font-bold uppercase">NIK</Label>
-                                        <Input value={data.nik} onChange={e => setData('nik', e.target.value)} className="h-12 rounded-xl" />
-                                        {errors.nik && <p className="text-xs text-red-500">{errors.nik}</p>}
+                                        <Label
+                                            className={cn(
+                                                'font-bold',
+                                                'text-xs',
+                                                'uppercase',
+                                            )}
+                                        >
+                                            NIK
+                                        </Label>
+                                        <Input
+                                            value={data.nik}
+                                            onChange={(e) =>
+                                                setData('nik', e.target.value)
+                                            }
+                                            className={cn('rounded-xl', 'h-12')}
+                                        />
+                                        {errors.nik && (
+                                            <p
+                                                className={cn(
+                                                    'text-red-500',
+                                                    'text-xs',
+                                                )}
+                                            >
+                                                {errors.nik}
+                                            </p>
+                                        )}
                                     </div>
                                     <div className="space-y-2">
-                                        <Label className="text-xs font-bold uppercase">Nama Lengkap</Label>
-                                        <Input value={data.nama_lengkap} onChange={e => setData('nama_lengkap', e.target.value)} className="h-12 rounded-xl" />
+                                        <Label
+                                            className={cn(
+                                                'font-bold',
+                                                'text-xs',
+                                                'uppercase',
+                                            )}
+                                        >
+                                            Nama Lengkap
+                                        </Label>
+                                        <Input
+                                            value={data.nama_lengkap}
+                                            onChange={(e) =>
+                                                setData(
+                                                    'nama_lengkap',
+                                                    e.target.value,
+                                                )
+                                            }
+                                            className={cn('rounded-xl', 'h-12')}
+                                        />
+                                        {errors.nama_lengkap && (
+                                            <p className={cn('text-red-500', 'text-xs', 'mt-1')}>
+                                                {errors.nama_lengkap}
+                                            </p>
+                                        )}
                                     </div>
                                     <div className="space-y-2">
-                                        <Label className="text-xs font-bold uppercase">Tempat Lahir</Label>
-                                        <Input value={data.tempat_lahir} onChange={e => setData('tempat_lahir', e.target.value)} className="h-12 rounded-xl" />
+                                        <Label
+                                            className={cn(
+                                                'font-bold',
+                                                'text-xs',
+                                                'uppercase',
+                                            )}
+                                        >
+                                            Tempat Lahir
+                                        </Label>
+                                        <Input
+                                            value={data.tempat_lahir}
+                                            onChange={(e) =>
+                                                setData(
+                                                    'tempat_lahir',
+                                                    e.target.value,
+                                                )
+                                            }
+                                            className={cn('rounded-xl', 'h-12')}
+                                        />
+                                        {errors.tempat_lahir && (
+                                            <p className={cn('text-red-500', 'text-xs', 'mt-1')}>
+                                                {errors.tempat_lahir}
+                                            </p>
+                                        )}
                                     </div>
                                     <div className="space-y-2">
-                                        <Label className="text-xs font-bold uppercase">Tanggal Lahir</Label>
-                                        <Input type="date" value={data.tanggal_lahir} onChange={e => setData('tanggal_lahir', e.target.value)} className="h-12 rounded-xl" />
+                                        <Label
+                                            className={cn(
+                                                'font-bold',
+                                                'text-xs',
+                                                'uppercase',
+                                            )}
+                                        >
+                                            Tanggal Lahir
+                                        </Label>
+                                        <Input
+                                            type="date"
+                                            value={data.tanggal_lahir}
+                                            onChange={(e) =>
+                                                setData(
+                                                    'tanggal_lahir',
+                                                    e.target.value,
+                                                )
+                                            }
+                                            className={cn('rounded-xl', 'h-12')}
+                                        />
+                                        {errors.tanggal_lahir && (
+                                            <p className={cn('text-red-500', 'text-xs', 'mt-1')}>
+                                                {errors.tanggal_lahir}
+                                            </p>
+                                        )}
                                     </div>
                                     <div className="space-y-2">
-                                        <Label className="text-xs font-bold uppercase">Jenis Kelamin</Label>
-                                        <Select value={data.jenis_kelamin} onValueChange={v => setData('jenis_kelamin', v)}>
-                                            <SelectTrigger className="h-12 rounded-xl"><SelectValue /></SelectTrigger>
+                                        <Label
+                                            className={cn(
+                                                'font-bold',
+                                                'text-xs',
+                                                'uppercase',
+                                            )}
+                                        >
+                                            Jenis Kelamin
+                                        </Label>
+                                        <Select
+                                            value={data.jenis_kelamin}
+                                            onValueChange={(v) =>
+                                                setData('jenis_kelamin', v)
+                                            }
+                                        >
+                                            <SelectTrigger
+                                                className={cn(
+                                                    'rounded-xl',
+                                                    'h-12',
+                                                )}
+                                            >
+                                                <SelectValue />
+                                            </SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem value="Laki-laki">Laki-laki</SelectItem>
-                                                <SelectItem value="Perempuan">Perempuan</SelectItem>
+                                                <SelectItem value="Laki-laki">
+                                                    Laki-laki
+                                                </SelectItem>
+                                                <SelectItem value="Perempuan">
+                                                    Perempuan
+                                                </SelectItem>
                                             </SelectContent>
                                         </Select>
+                                        {errors.jenis_kelamin && (
+                                            <p className={cn('text-red-500', 'text-xs', 'mt-1')}>
+                                                {errors.jenis_kelamin}
+                                            </p>
+                                        )}
                                     </div>
                                     <div className="space-y-2">
-                                        <Label className="text-xs font-bold uppercase">No HP</Label>
-                                        <Input value={data.no_hp} onChange={e => setData('no_hp', e.target.value)} className="h-12 rounded-xl" />
+                                        <Label
+                                            className={cn(
+                                                'font-bold',
+                                                'text-xs',
+                                                'uppercase',
+                                            )}
+                                        >
+                                            No HP
+                                        </Label>
+                                        <Input
+                                            value={data.no_hp}
+                                            onChange={(e) =>
+                                                setData('no_hp', e.target.value)
+                                            }
+                                            className={cn('rounded-xl', 'h-12')}
+                                        />
+                                        {errors.no_hp && (
+                                            <p className={cn('text-red-500', 'text-xs', 'mt-1')}>
+                                                {errors.no_hp}
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className="text-xs font-bold uppercase">Alamat</Label>
-                                    <Input value={data.alamat} onChange={e => setData('alamat', e.target.value)} className="h-12 rounded-xl" />
+                                    <Label
+                                        className={cn(
+                                            'font-bold',
+                                            'text-xs',
+                                            'uppercase',
+                                        )}
+                                    >
+                                        Alamat
+                                    </Label>
+                                    <Input
+                                        value={data.alamat}
+                                        onChange={(e) =>
+                                            setData('alamat', e.target.value)
+                                        }
+                                        className={cn('rounded-xl', 'h-12')}
+                                    />
+                                    {errors.alamat && (
+                                        <p className={cn('text-red-500', 'text-xs', 'mt-1')}>
+                                            {errors.alamat}
+                                        </p>
+                                    )}
                                 </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div
+                                    className={cn(
+                                        'gap-6',
+                                        'grid',
+                                        'grid-cols-1',
+                                        'md:grid-cols-2',
+                                    )}
+                                >
                                     <div className="space-y-2">
-                                        <Label className="text-xs font-bold uppercase">Kota</Label>
-                                        <Input value={data.kota} onChange={e => setData('kota', e.target.value)} className="h-12 rounded-xl" />
+                                        <Label
+                                            className={cn(
+                                                'font-bold',
+                                                'text-xs',
+                                                'uppercase',
+                                            )}
+                                        >
+                                            Kota
+                                        </Label>
+                                        <Input
+                                            value={data.kota}
+                                            onChange={(e) =>
+                                                setData('kota', e.target.value)
+                                            }
+                                            className={cn('rounded-xl', 'h-12')}
+                                        />
+                                        {errors.kota && (
+                                            <p className={cn('text-red-500', 'text-xs', 'mt-1')}>
+                                                {errors.kota}
+                                            </p>
+                                        )}
                                     </div>
                                     <div className="space-y-2">
-                                        <Label className="text-xs font-bold uppercase">Provinsi</Label>
-                                        <Input value={data.provinsi} onChange={e => setData('provinsi', e.target.value)} className="h-12 rounded-xl" />
+                                        <Label
+                                            className={cn(
+                                                'font-bold',
+                                                'text-xs',
+                                                'uppercase',
+                                            )}
+                                        >
+                                            Provinsi
+                                        </Label>
+                                        <Input
+                                            value={data.provinsi}
+                                            onChange={(e) =>
+                                                setData(
+                                                    'provinsi',
+                                                    e.target.value,
+                                                )
+                                            }
+                                            className={cn('rounded-xl', 'h-12')}
+                                        />
+                                        {errors.provinsi && (
+                                            <p className={cn('text-red-500', 'text-xs', 'mt-1')}>
+                                                {errors.provinsi}
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
                             </CardContent>
                         </Card>
                     </div>
 
-                    <div className="lg:col-span-4 space-y-6">
-                        <Card className="border-none shadow-xl rounded-[32px] overflow-hidden sticky top-8">
-                            <CardHeader className="bg-amber-500 text-white p-6">
-                                <CardTitle className="text-lg flex items-center gap-2"><Package className="h-5 w-5" /> Ringkasan</CardTitle>
+                    <div className={cn('space-y-6', 'lg:col-span-4')}>
+                        <Card
+                            className={cn(
+                                'top-8',
+                                'sticky',
+                                'shadow-xl',
+                                'border-none',
+                                'rounded-[32px]',
+                                'overflow-hidden',
+                            )}
+                        >
+                            <CardHeader
+                                className={cn(
+                                    'bg-amber-500',
+                                    'p-6',
+                                    'text-white',
+                                )}
+                            >
+                                <CardTitle
+                                    className={cn(
+                                        'flex',
+                                        'items-center',
+                                        'gap-2',
+                                        'text-lg',
+                                    )}
+                                >
+                                    <Package className={cn('w-5', 'h-5')} />{' '}
+                                    Ringkasan
+                                </CardTitle>
                             </CardHeader>
-                            <CardContent className="p-6 space-y-6">
+                            <CardContent className={cn('space-y-6', 'p-6')}>
                                 <div>
-                                    <p className="font-black text-xl">{keberangkatan.paket_umroh.nama_paket}</p>
-                                    <p className="text-2xl font-black text-amber-600">{formatCurrency(keberangkatan.paket_umroh.harga)}</p>
+                                    <p className={cn('font-black', 'text-xl')}>
+                                        {keberangkatan.paket_umroh.nama_paket}
+                                    </p>
+                                    <p
+                                        className={cn(
+                                            'font-black',
+                                            'text-amber-600',
+                                            'text-2xl',
+                                        )}
+                                    >
+                                        {formatCurrency(
+                                            keberangkatan.paket_umroh.harga,
+                                        )}
+                                    </p>
                                 </div>
-                                <div className="space-y-4 pt-4 border-t">
-                                    <Label className="text-xs font-bold">Pilih Tanggal</Label>
-                                    <Select value={data.keberangkatan_id.toString()} onValueChange={v => setData('keberangkatan_id', parseInt(v))}>
-                                        <SelectTrigger className="h-12 rounded-xl border-2 border-amber-100"><SelectValue /></SelectTrigger>
+                                <div
+                                    className={cn(
+                                        'space-y-4',
+                                        'pt-4',
+                                        'border-t',
+                                    )}
+                                >
+                                    <Label
+                                        className={cn('font-bold', 'text-xs')}
+                                    >
+                                        Pilih Tanggal
+                                    </Label>
+                                    <Select
+                                        value={data.keberangkatan_id.toString()}
+                                        onValueChange={(v) =>
+                                            setData(
+                                                'keberangkatan_id',
+                                                parseInt(v),
+                                            )
+                                        }
+                                    >
+                                        <SelectTrigger
+                                            className={cn(
+                                                'border-2',
+                                                'border-amber-100',
+                                                'rounded-xl',
+                                                'h-12',
+                                            )}
+                                        >
+                                            <SelectValue />
+                                        </SelectTrigger>
                                         <SelectContent>
-                                            {all_keberangkatan.map(k => <SelectItem key={k.id} value={k.id.toString()}>{formatDate(k.tanggal_berangkat)}</SelectItem>)}
+                                            {all_keberangkatan.map((k) => (
+                                                <SelectItem
+                                                    key={k.id}
+                                                    value={k.id.toString()}
+                                                >
+                                                    {formatDate(
+                                                        k.tanggal_berangkat,
+                                                    )}
+                                                </SelectItem>
+                                            ))}
                                         </SelectContent>
                                     </Select>
                                 </div>
-                                <div className="flex items-start space-x-3 pt-4">
-                                    <Checkbox id="konfirmasi" checked={data.konfirmasi} onCheckedChange={v => setData('konfirmasi', v as boolean)} />
-                                    <Label htmlFor="konfirmasi" className="text-[10px] italic">Data yang saya isi benar.</Label>
-                                </div>
-                                <Button 
-                                    type="submit" 
-                                    className={cn("w-full h-16 text-lg font-black rounded-2xl shadow-lg", isDocumentComplete ? "bg-amber-600 text-white" : "bg-muted text-muted-foreground")}
-                                    disabled={processing || !data.konfirmasi || !isDocumentComplete}
+                                <div
+                                    className={cn(
+                                        'flex',
+                                        'items-start',
+                                        'space-x-3',
+                                        'pt-4',
+                                    )}
                                 >
-                                    {processing ? 'Mendaftarkan...' : 'Daftar Sekarang'}
+                                    <Checkbox
+                                        id="konfirmasi"
+                                        checked={data.konfirmasi}
+                                        onCheckedChange={(v) =>
+                                            setData('konfirmasi', v as boolean)
+                                        }
+                                    />
+                                    <Label
+                                        htmlFor="konfirmasi"
+                                        className={cn(
+                                            '[10px textre text-red-800',
+                                            'italic',
+                                            'textw',
+                                        )}
+                                    >
+                                        Data yang saya isi benar.
+                                    </Label>
+                                </div>
+                                <Button
+                                    type="submit"
+                                    className={cn(
+                                        'h-16 w-full rounded-2xl text-lg font-black shadow-lg',
+                                        isDocumentComplete
+                                            ? 'bg-amber-600 text-white'
+                                            : 'bg-muted text-muted-foreground',
+                                    )}
+                                    disabled={
+                                        processing ||
+                                        !data.konfirmasi ||
+                                        !isDocumentComplete
+                                    }
+                                >
+                                    {processing
+                                        ? 'Mendaftarkan...'
+                                        : 'Daftar Sekarang'}
                                 </Button>
                             </CardContent>
                         </Card>
                     </div>
                 </form>
 
-                <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
-                    <DialogContent className="max-w-md rounded-[32px] p-0 overflow-hidden border-none shadow-2xl text-center">
-                        <div className="bg-green-600 p-8 text-white">
-                            <CheckCircle2 className="h-16 w-16 mx-auto mb-4" />
-                            <h2 className="text-2xl font-black">Pendaftaran Berhasil!</h2>
+                <Dialog
+                    open={showSuccessModal}
+                    onOpenChange={setShowSuccessModal}
+                >
+                    <DialogContent
+                        className={cn(
+                            'shadow-2xl',
+                            'p-0',
+                            'border-none',
+                            'rounded-[32px]',
+                            'max-w-md',
+                            'overflow-hidden',
+                            'text-center',
+                        )}
+                    >
+                        <div
+                            className={cn('bg-green-600', 'p-8', 'text-white')}
+                        >
+                            <CheckCircle2
+                                className={cn(
+                                    'mx-auto',
+                                    'mb-4',
+                                    'w-16',
+                                    'h-16',
+                                )}
+                            />
+                            <h2 className={cn('font-black', 'text-2xl')}>
+                                Pendaftaran Berhasil!
+                            </h2>
                         </div>
-                        <div className="p-8 space-y-4">
-                            <p className="font-medium">Silakan lanjut ke pembayaran untuk mengamankan kursi Anda.</p>
-                            <Button className="w-full h-14 bg-blue-600 text-white font-bold rounded-2xl" onClick={() => router.visit(route('jamaah.pembayaran'))}>Lanjut ke Pembayaran</Button>
-                            <Button variant="ghost" className="w-full" onClick={() => router.visit(route('jamaah.pendaftaran'))}>Lihat Pesanan Saya</Button>
+                        <div className={cn('space-y-4', 'p-8')}>
+                            <p className="font-medium">
+                                Silakan lanjut ke pembayaran untuk mengamankan
+                                kursi Anda.
+                            </p>
+                            <Button
+                                className={cn(
+                                    'bg-blue-600',
+                                    'rounded-2xl',
+                                    'w-full',
+                                    'h-14',
+                                    'font-bold',
+                                    'text-white',
+                                )}
+                                onClick={() =>
+                                    router.visit(route('jamaah.pembayaran'))
+                                }
+                            >
+                                Lanjut ke Pembayaran
+                            </Button>
+                            <Button
+                                variant="ghost"
+                                className="w-full"
+                                onClick={() =>
+                                    router.visit(route('jamaah.pendaftaran'))
+                                }
+                            >
+                                Lihat Pesanan Saya
+                            </Button>
                         </div>
                     </DialogContent>
                 </Dialog>

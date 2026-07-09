@@ -12,30 +12,30 @@ export default function FasilitasIndex({ fasilitas }: PageProps) {
     return (
         <>
             <Head title="Master Fasilitas" />
-            <div className="flex flex-col gap-8 p-6 md:p-10 max-w-7xl mx-auto w-full">
+            <div className="flex flex-col gap-8 mx-auto p-6 md:p-10 w-full max-w-7xl">
                 {/* Header Section */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="flex md:flex-row flex-col justify-between md:items-center gap-6">
                     <div className="flex flex-col gap-3">
                         <div className="flex items-center gap-3">
-                            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-600 text-white shadow-xl shadow-purple-600/20">
-                                <Box className="h-6 w-6" />
+                            <div className="flex justify-center items-center bg-purple-600 shadow-purple-600/20 shadow-xl rounded-2xl w-12 h-12 text-white">
+                                <Box className="w-6 h-6" />
                             </div>
-                            <h1 className="text-3xl font-black tracking-tight text-foreground">Master Fasilitas</h1>
+                            <h1 className="font-black text-foreground text-3xl tracking-tight">Master Fasilitas</h1>
                         </div>
-                        <p className="text-muted-foreground text-lg italic max-w-2xl">
+                        <p className="max-w-2xl text-muted-foreground text-lg italic">
                             Kelola daftar master fasilitas dan perlengkapan yang dapat ditawarkan ke setiap paket umroh.
                         </p>
                     </div>
 
                     {!window.location.pathname.startsWith('/super-admin') && (
                         <div className="flex items-center gap-3">
-                            <Button variant="outline" className="h-12 rounded-2xl border-neutral-200 bg-white font-bold px-6 shadow-sm hover:bg-neutral-50 gap-2">
-                                <Download className="h-4 w-4" />
+                            {/* <Button variant="outline" className="gap-2 bg-white hover:bg-neutral-50 shadow-sm px-6 border-neutral-200 rounded-2xl h-12 font-bold">
+                                <Download className="w-4 h-4" />
                                 Export
-                            </Button>
-                            <Button asChild className="h-12 rounded-2xl bg-neutral-900 text-white font-bold px-6 shadow-xl hover:bg-neutral-800 gap-2">
+                            </Button> */}
+                            <Button asChild className="gap-2 bg-neutral-900 hover:bg-neutral-800 shadow-xl px-6 rounded-2xl h-12 font-bold text-white">
                                 <Link href={route('admin.fasilitas.create')}>
-                                    <Plus className="h-4 w-4" />
+                                    <Plus className="w-4 h-4" />
                                     Tambah Fasilitas
                                 </Link>
                             </Button>

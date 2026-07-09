@@ -17,21 +17,6 @@ class LoginResponse implements LoginResponseContract
      */
     public function toResponse($request): Response
     {
-        $user = Auth::user();
-
-        if ($user->hasRole('super_admin')) {
-            return redirect()->intended(route('super-admin.dashboard'));
-        }
-
-        if ($user->hasRole('admin')) {
-            return redirect()->intended(route('admin.dashboard'));
-        }
-
-        if ($user->hasRole('staff_keuangan')) {
-            return redirect()->intended(route('staff-keuangan.dashboard'));
-        }
-
-        // Default to jamaah or fallback
-        return redirect()->intended(route('jamaah.beranda'));
+        return redirect()->intended(route('dashboard'));
     }
 }

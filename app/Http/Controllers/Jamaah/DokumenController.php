@@ -12,15 +12,24 @@ class DokumenController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
+        $jamaah = $user->jamaah;
         
-        if (!$user->jamaah) {
-            return Inertia::render('jamaah/dokumen/index', [
-                'dokumen' => [],
-                'categories' => $this->getRequiredCategories()
+        if (!$jamaah) {
+            $jamaah = \App\Models\Jamaah::create([
+                'user_id' => $user->id,
+                'nik' => null,
+                'nama_lengkap' => $user->name,
+                'tempat_lahir' => null,
+                'tanggal_lahir' => null,
+                'jenis_kelamin' => null,
+                'no_hp' => null,
+                'alamat' => null,
+                'kota' => null,
+                'provinsi' => null,
             ]);
         }
 
-        $dokumen = Dokumen::where('jamaah_id', $user->jamaah->id)->get()->groupBy('jenis');
+        $dokumen = Dokumen::where('jamaah_id', $jamaah->id)->get()->groupBy('jenis');
 
         return Inertia::render('jamaah/dokumen/index', [
             'dokumen' => $dokumen,
@@ -39,7 +48,18 @@ class DokumenController extends Controller
         $jamaah = $user->jamaah;
 
         if (!$jamaah) {
-            return back()->with('error', 'Profil jamaah tidak ditemukan.');
+            $jamaah = \App\Models\Jamaah::create([
+                'user_id' => $user->id,
+                'nik' => null,
+                'nama_lengkap' => $user->name,
+                'tempat_lahir' => null,
+                'tanggal_lahir' => null,
+                'jenis_kelamin' => null,
+                'no_hp' => null,
+                'alamat' => null,
+                'kota' => null,
+                'provinsi' => null,
+            ]);
         }
 
         // Handle file upload
