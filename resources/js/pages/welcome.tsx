@@ -160,7 +160,7 @@ export default function Welcome({
                                     <span>Penyelenggara Umroh & Haji Terpercaya</span>
                                 </div>
                                 <h1 className="font-extrabold text-white text-4xl sm:text-6xl leading-tight tracking-tight">
-                                    Wujudkan Perjalanan <span className="bg-clip-text bg-gradient-to-r from-amber-400 to-amber-200 text-transparent">Umroh yang Sunnah</span> & Premium
+                                    Wujudkan aaaaaaaaaaaaaaaaaaa Perjalanan <span className="bg-clip-text bg-gradient-to-r from-amber-400 to-amber-200 text-transparent">Umroh yang Sunnah</span> & Premium
                                 </h1>
                                 <p className="mx-auto lg:mx-0 max-w-2xl text-emerald-100/80 text-lg leading-8">
                                     Bersama {name}, jalani ibadah suci ke Baitullah dengan tenang, aman, dan nyaman didampingi pembimbing yang berkompeten sesuai tuntunan Rasulullah SAW.
