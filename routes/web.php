@@ -109,6 +109,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('pendaftaran', [\App\Http\Controllers\Jamaah\PendaftaranController::class, 'index'])->name('pendaftaran');
         Route::get('pendaftaran/konfirmasi/{keberangkatan_id}', [\App\Http\Controllers\Jamaah\PendaftaranController::class, 'konfirmasi'])->name('pendaftaran.konfirmasi');
         Route::get('pendaftaran/{id}', [\App\Http\Controllers\Jamaah\PendaftaranController::class, 'show'])->name('pendaftaran.show');
+        Route::get('pendaftaran/{id}/kuitansi', [\App\Http\Controllers\Jamaah\PendaftaranController::class, 'kuitansi'])->name('pendaftaran.kuitansi');
         Route::post('pendaftaran', [\App\Http\Controllers\Jamaah\PendaftaranController::class, 'store'])->name('pendaftaran.store');
         
         Route::get('dokumen', [\App\Http\Controllers\Jamaah\DokumenController::class, 'index'])->name('dokumen');

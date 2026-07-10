@@ -183,12 +183,15 @@ export default function PendaftaranShow({
                                 )}
                             </p>
                         </div>
-                        {/* <Button
+                        <Button
+                            asChild
                             variant="outline"
                             className={cn('hover:bg-amber-50', 'border-amber-200', 'rounded-xl', 'text-amber-700')}
                         >
-                            Download Invoice
-                        </Button> */}
+                            <a href={route('jamaah.pendaftaran.kuitansi', pendaftaran.id)} target="_blank">
+                                Download Invoice
+                            </a>
+                        </Button>
                         <Button
                             asChild
                             className={cn(

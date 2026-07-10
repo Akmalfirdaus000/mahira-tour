@@ -43,6 +43,27 @@ class PendaftaranController extends Controller
         ]);
     }
 
+    public function kuitansi($id)
+    {
+        $user = auth()->user();
+        $pendaftaran = Pendaftaran::with(['keberangkatan.paketUmroh', 'pembayaran' => function($q) {
+            $q->where('status', 'sukses');
+        }, 'jamaah'])
+            ->where('jamaah_id', $user->jamaah->id)
+            ->findOrFail($id);
+
+        $total_bayar = $pendaftaran->pembayaran->sum('jumlah');
+        $sisa_bayar = $pendaftaran->keberangkatan->paketUmroh->harga - $total_bayar;
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.kuitansi', [
+            'pendaftaran' => $pendaftaran,
+            'total_bayar' => $total_bayar,
+            'sisa_bayar' => $sisa_bayar
+        ]);
+
+        return $pdf->download('Invoice_Mahira_Tour_REG-'.str_pad($pendaftaran->id, 5, '0', STR_PAD_LEFT).'.pdf');
+    }
+
     public function index(Request $request)
     {
         $user = $request->user();
