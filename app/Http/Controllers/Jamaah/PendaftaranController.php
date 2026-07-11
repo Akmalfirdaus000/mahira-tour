@@ -39,7 +39,8 @@ class PendaftaranController extends Controller
                 ['id' => 'kk', 'label' => 'KK'],
                 ['id' => 'surat_nikah', 'label' => 'Surat Nikah'],
                 ['id' => 'vaksin', 'label' => 'Vaksin'],
-            ]
+            ],
+            'kuitansi_url' => route('jamaah.pendaftaran.kuitansi', $pendaftaran->id),
         ]);
     }
 

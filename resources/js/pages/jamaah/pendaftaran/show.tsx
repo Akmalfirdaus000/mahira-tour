@@ -35,6 +35,7 @@ interface PageProps {
     };
     documents: Record<string, any[]>;
     categories: any[];
+    kuitansi_url: string;
 }
 
 export default function PendaftaranShow({
@@ -42,6 +43,7 @@ export default function PendaftaranShow({
     summary,
     documents,
     categories,
+    kuitansi_url,
 }: PageProps) {
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('id-ID', {
@@ -188,7 +190,7 @@ export default function PendaftaranShow({
                             variant="outline"
                             className={cn('hover:bg-amber-50', 'border-amber-200', 'rounded-xl', 'text-amber-700')}
                         >
-                            <a href={`/jamaah/pendaftaran/${pendaftaran.id}/kuitansi`} target="_blank">
+                            <a href={kuitansi_url} target="_blank">
                                 Download Invoice
                             </a>
                         </Button>
