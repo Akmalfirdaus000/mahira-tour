@@ -188,7 +188,7 @@ export default function PendaftaranShow({
                             variant="outline"
                             className={cn('hover:bg-amber-50', 'border-amber-200', 'rounded-xl', 'text-amber-700')}
                         >
-                            <a href={route('jamaah.pendaftaran.kuitansi', pendaftaran.id)} target="_blank">
+                            <a href={`/jamaah/pendaftaran/${pendaftaran.id}/kuitansi`} target="_blank">
                                 Download Invoice
                             </a>
                         </Button>
